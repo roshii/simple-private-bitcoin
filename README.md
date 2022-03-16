@@ -9,8 +9,25 @@ Clone project to local file system with [`git`](https://git-scm.com/).
 
 ## Usage
 
+Start bitcoin node behind a tor proxy as follows.
+
+```bash
+docker-compose up
 ```
+
+Reindex blocks from existing volume.
+
+```bash
+docker-compose run bitcoin -reindex
 ```
+
+### Configuration
+
+Bitcoin data are persisted to local file system and can be configured with the following environment variables and which may be set in a `.env` file.
+
+* `BITCOIN_BLOCKS_MOUNTPOINT`
+* `BITCOIN_DATA_MOUNTPOINT`
+* `BITCOIN_WALLET_MOUNTPOIN`
 
 ## Contributing
 

@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  bitcoin:
+    build:
+      args:
+        bitcoin_version_tag: ${BITCOIN_VERION_TAG:-v22.0}
+      context: bitcoin
+    container_name: bitcoin
+    depends_on:
+      - tor
+    image: bitcoin
+    networks:
+      - private
+    volumes:
+        - bitcoin:/var/lib/bitcoin
+        - tor:/var/lib/tor:ro
+        - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/blocks}:/srv/blocks
+        - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin/data}:/srv/data
+        - ${BITCOIN_WALLET_MOUNTPOINT:-.data/bitcoin/wallet}:/srv/wallet
+    restart: unless-stopped
+  tor:
+    build:
+      context: tor
+    container_name: tor
+    image: tor
+    networks:
+      - private
+    volumes:
+      - tor:/var/lib/tor
+    restart: unless-stopped
+
+networks:
+  private:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.3.1.0/24
+
+volumes:
+  tor:
+  bitcoin:

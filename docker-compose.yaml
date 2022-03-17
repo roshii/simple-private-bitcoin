@@ -29,6 +29,15 @@ services:
     volumes:
       - tor:/var/lib/tor
     restart: unless-stopped
+  joinmarket:
+    build:
+      args:
+        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.5}
+      context: joinmarket
+    container_name: joinmarket
+    image: joinmarket
+    networks:
+      - private
 
 networks:
   private:

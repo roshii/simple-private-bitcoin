@@ -1,5 +1,5 @@
 ARG image_tag=3.15
-FROM alpine:${image_tag} AS libs
+FROM alpine:${image_tag} AS libraries
 
 RUN apk add build-base autoconf automake libtool git
 WORKDIR /var/tmp/secp256k1
@@ -39,7 +39,7 @@ RUN ./autogen.sh \
   && make check \
   && make install
 
-FROM python:3.10-alpine${image_tag}
+FROM python:3.10-alpine${image_tag} AS builder
 
 ARG joinmarket_version_tag=v0.9.5
 
@@ -48,10 +48,17 @@ RUN apk add git
 RUN git clone --depth 1 --branch ${joinmarket_version_tag} \
   https://github.com/JoinMarket-Org/joinmarket-clientserver.git .
 
-COPY --from=libs /srv /usr
-RUN apk add build-base
-RUN apk add openssl3-dev
-RUN pip install -U pip setuptools virtualenv \
-  && virtualenv /opt \
-  && source /opt/bin/activate \
-  && pip install -r requirements/base.txt
+COPY --from=libraries /srv /usr
+RUN apk add build-base openssl3-dev
+RUN pip install -U pip setuptools \
+  && pip wheel -w /srv -r requirements/base.txt
+
+FROM python:3.10-alpine${image_tag}
+ARG python_version=3.10
+COPY --from=builder /srv /opt/joinmarket
+RUN pip install --no-cache /opt/joinmarket/*
+ARG workdir=/opt/joinmarket
+COPY --from=builder /var/tmp/scripts ${workdir}
+WORKDIR ${workdir}
+
+ENTRYPOINT ["python"]

@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  tor:
+    build:
+      context: tor
+    container_name: tor
+    image: tor
+    networks:
+      - private
+    volumes:
+      - tor:/var/lib/tor
+    restart: unless-stopped
   bitcoin:
     build:
       args:
@@ -18,16 +28,6 @@ services:
         - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/blocks}:/srv/blocks
         - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin/data}:/srv/data
         - ${BITCOIN_WALLET_MOUNTPOINT:-.data/bitcoin/wallet}:/srv/wallet
-    restart: unless-stopped
-  tor:
-    build:
-      context: tor
-    container_name: tor
-    image: tor
-    networks:
-      - private
-    volumes:
-      - tor:/var/lib/tor
     restart: unless-stopped
   joinmarket:
     build:

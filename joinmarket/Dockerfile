@@ -44,5 +44,6 @@ RUN apk add libsodium \
 
 WORKDIR /opt/jm
 COPY --from=builder /src/scripts /opt/jm
+COPY joinmarket.cfg /srv/joinmarket.cfg
 
 ENTRYPOINT ["python"]

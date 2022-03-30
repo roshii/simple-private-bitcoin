@@ -35,9 +35,14 @@ services:
         joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.5}
       context: joinmarket
     container_name: joinmarket
+    depends_on:
+      - bitcoin
     image: joinmarket
     networks:
       - private
+    volumes:
+      - bitcoin:/var/lib/bitcoin:ro
+      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
 
 networks:
   private:

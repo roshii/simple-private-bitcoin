@@ -1,6 +1,6 @@
 ARG image_tag=3.15
 FROM python:3.10-alpine${image_tag} AS build-base
-WORKDIR /var/tmp
+WORKDIR /src
 RUN apk add \
   autoconf \
   automake \
@@ -38,12 +38,11 @@ RUN pip install --no-cache -U pip setuptools \
 
 FROM python:3.10-alpine${image_tag}
 COPY --from=libsecp256k1 /srv /usr
-COPY --from=builder /srv /opt/joinmarket
+COPY --from=builder /srv /tmp/pip
 RUN apk add libsodium \
-  && pip install --no-cache /opt/joinmarket/*
+  && pip install --no-cache /tmp/pip/*
 
-ARG workdir=/opt/joinmarket
-COPY --from=builder /var/tmp/scripts ${workdir}
-WORKDIR ${workdir}
+WORKDIR /opt/jm
+COPY --from=builder /src/scripts /opt/jm
 
 ENTRYPOINT ["python"]

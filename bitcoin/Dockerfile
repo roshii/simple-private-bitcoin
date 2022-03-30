@@ -1,6 +1,6 @@
 ARG image_tag=3.15
-FROM python:3.10-alpine${image_tag} AS build-base
-WORKDIR /var/tmp
+FROM alpine:${image_tag} AS build-base
+WORKDIR /src
 RUN apk add \
   autoconf \
   automake \
@@ -57,5 +57,5 @@ RUN apk add \
   /srv/data \
   /srv/wallet
 
-COPY bitcoin.conf /srv/data/bitcoin.conf
+COPY bitcoin.conf /root/.bitcoin/bitcoin.conf
 ENTRYPOINT ["bitcoin-node"]

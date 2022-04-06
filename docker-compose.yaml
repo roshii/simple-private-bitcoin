@@ -42,7 +42,7 @@ services:
       - private
     volumes:
       - bitcoin:/var/lib/bitcoin:ro
-      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
+      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/root/.joinmarket
 
 networks:
   private:

@@ -1,5 +1,6 @@
 #!/bin/ash
 set -e
-script="$1"
-args="${@/$1}"
-exec python "$script" --datadir=/srv $args
+datadir=/root/.joinmarket
+config_file="${datadir}/joinmarket.cfg"
+! [[ -f "$config_file" ]] && mv /tmp/joinmarket.cfg "$config_file"
+python $@

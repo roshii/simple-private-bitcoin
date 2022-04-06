@@ -37,7 +37,7 @@ RUN pip install --no-cache -U pip setuptools \
   zope.interface
 
 FROM python:3.10-alpine${image_tag}
-COPY --from=libsecp256k1 /srv /usr
+COPY --from=libsecp256k1 /srv /usr/local
 COPY --from=builder /srv /tmp/pip
 RUN apk add libsodium \
   && pip install --no-cache /tmp/pip/*

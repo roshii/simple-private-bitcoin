@@ -1,6 +1,10 @@
 #!/bin/ash
 set -e
-datadir=/root/.joinmarket
-config_file="${datadir}/joinmarket.cfg"
-! [[ -f "$config_file" ]] && mv /tmp/joinmarket.cfg "$config_file"
-python $@
+
+datadir="/root/.joinmarket"
+file_name="joinmarket.cfg"
+target="${datadir}/${file_name}"
+
+! [ -f "$target" ] && mv "/etc/opt/${file_name}" "$target"
+
+python "$@"

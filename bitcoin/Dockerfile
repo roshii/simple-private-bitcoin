@@ -62,6 +62,6 @@ RUN mkdir \
   /srv/wallet
 
 COPY bitcoin.conf /etc/bitcoin.conf
-COPY entrypoint.sh /usr/bin/entrypoint.sh
-ENTRYPOINT ["entrypoint.sh"]
+COPY entrypoint.sh /usr/bin/run
+ENTRYPOINT ["run"]
 CMD ["bitcoin-node"]

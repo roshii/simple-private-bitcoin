@@ -49,6 +49,6 @@ WORKDIR /opt/jm
 COPY --from=builder /src/scripts /opt/jm
 COPY joinmarket.cfg /etc/joinmarket.cfg
 
-COPY entrypoint.sh /usr/bin/entrypoint.sh
-ENTRYPOINT ["entrypoint.sh"]
+COPY entrypoint.sh /usr/bin/run
+ENTRYPOINT ["run"]
 CMD ["joinmarketd.py"]

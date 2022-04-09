@@ -1,10 +1,20 @@
 #!/bin/ash
 set -e
 
-datadir="/root/.joinmarket"
-file_name="joinmarket.cfg"
-target="${datadir}/${file_name}"
+user="jm"
+datadir="/srv"
+scriptdir="/opt/jm"
+chown -R "$user" "$datadir"
 
-! [ -f "$target" ] && cp "/etc/${file_name}" "$target"
+# Add datadir flag for Joinmarket scripts
+cmd="$1"
+found=$(find "$scriptdir" -name "$cmd" -type f -print)
 
-python "$@"
+if [ "$cmd" == "joinmarketd.py" ] ; then
+  su-exec "$user" python "$@"
+elif [ -n "$found" ] ; then
+  shift
+  su-exec "$user" python "$cmd" "--datadir=${datadir}" "$@"
+else
+  su-exec "$user" "$@"
+fi

@@ -50,12 +50,18 @@ RUN apk add \
   capnproto \
   libevent \
   sqlite-dev \
-  zeromq \
-  && mkdir \
+  zeromq
+
+RUN adduser -D -g bitcoin bitcoin \
+  && apk add su-exec
+
+RUN mkdir \
   /var/lib/bitcoin \
   /srv/blocks \
   /srv/data \
   /srv/wallet
 
-COPY bitcoin.conf /root/.bitcoin/bitcoin.conf
-ENTRYPOINT ["bitcoin-node"]
+COPY bitcoin.conf /etc/bitcoin.conf
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["bitcoin-node"]

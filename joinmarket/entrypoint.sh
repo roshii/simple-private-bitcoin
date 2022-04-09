@@ -4,6 +4,15 @@ set -e
 user="jm"
 datadir="/srv"
 scriptdir="/opt/jm"
+
+# Copy default config if none is set
+file_name="joinmarket.cfg"
+target="${datadir}/${file_name}"
+
+if ! [ -f "$target" ]; then
+  cp "/etc/${file_name}" "$datadir"
+fi
+
 chown -R "$user" "$datadir"
 
 # Add datadir flag for Joinmarket scripts

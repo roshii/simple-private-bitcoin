@@ -1,35 +1,39 @@
 ARG image_tag=3.15
-FROM alpine:${image_tag} AS libmultiprocess
+FROM alpine:${image_tag} AS build-base
+WORKDIR /src
+RUN apk add \
+  autoconf \
+  automake \
+  build-base \
+  capnproto-dev \
+  git \
+  libtool
 
-WORKDIR /var/tmp
-RUN apk add git
-RUN git clone --depth 1 https://github.com/chaincodelabs/libmultiprocess.git .
+FROM build-base AS libmultiprocess
+RUN apk add cmake
 
-RUN apk add build-base cmake
-RUN apk add capnproto-dev
+RUN git clone --depth 1 \
+  https://github.com/chaincodelabs/libmultiprocess.git .
 RUN mkdir build \
   && cd build \
   && cmake .. \
   && make -j $(nproc) \
   && make DESTDIR=/srv install
 
-FROM alpine:${image_tag} AS builder
+FROM build-base AS builder
+COPY --from=libmultiprocess /srv /
+RUN apk add \
+  boost-dev \
+  libevent-dev \
+  pkgconfig \
+  sqlite-dev \
+  zeromq-dev
 
 ARG bitcoin_version_tag=v22.0
-
-WORKDIR /var/tmp
-RUN apk add git
 RUN git clone --depth 1 --branch ${bitcoin_version_tag} \
   https://github.com/bitcoin/bitcoin.git .
-
-RUN apk add autoconf automake libtool pkgconfig
-RUN ./autogen.sh
-
-RUN apk add build-base boost-dev libevent-dev
-RUN apk add capnproto-dev sqlite-dev zeromq-dev
-COPY --from=libmultiprocess /srv /
-
-RUN ./configure \
+RUN ./autogen.sh \
+  && ./configure \
   --prefix=/srv \
   --enable-multiprocess \
   --without-bdb \
@@ -40,19 +44,24 @@ RUN ./configure \
   && make install
 
 FROM alpine:${image_tag}
-
 COPY --from=builder /srv /usr
 RUN apk add \
   boost1.77-filesystem \
   capnproto \
   libevent \
   sqlite-dev \
-  zeromq \
-  && mkdir \
+  zeromq
+
+RUN adduser -D -g bitcoin bitcoin \
+  && apk add su-exec
+
+RUN mkdir \
   /var/lib/bitcoin \
   /srv/blocks \
   /srv/data \
   /srv/wallet
 
-COPY bitcoin.conf /srv/data/bitcoin.conf
-ENTRYPOINT ["bitcoin-node"]
+COPY bitcoin.conf /etc/bitcoin.conf
+COPY entrypoint.sh /usr/bin/run
+ENTRYPOINT ["run"]
+CMD ["bitcoin-node"]

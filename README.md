@@ -2,6 +2,10 @@
 
 Simple, self-hosted and self-managed containerized Bitcoin services definition.
 
+* tor proxy
+* bitcoin node
+* joinmarket
+
 ## Installation
 
 Make sure both [`docker`](https://www.docker.com/get-started) and [`docker-compose`](https://docs.docker.com/compose/cli-command/#installing-compose-v2) commands are available.
@@ -9,15 +13,28 @@ Clone project to local file system with [`git`](https://git-scm.com/).
 
 ## Usage
 
-Start bitcoin node behind a tor proxy as follows.
+Start all services with a single command as follows.
 
-```bash
+```sh
 docker-compose up
 ```
 
-Reindex blocks from existing volume.
+Bitcoin service will create a `joinmarket` wallet upon startup, used by joinmarket to _store addresses as watch-only_ in this wallet.
+Joinmarket wallet on the other hand has to be created interactively with the following commmand.
 
-```bash
+```sh
+docker-compose exec joinmarket run wallet-toool.py generate
+```
+
+Yield generator can be started with the following command.
+
+```sh
+docker-compose exec joinmarket run yg-privacyenhanced.py generate
+```
+
+## Reindex blocks from existing volume.
+
+```sh
 docker-compose run bitcoin -reindex
 ```
 

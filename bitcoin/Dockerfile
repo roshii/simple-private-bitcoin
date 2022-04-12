@@ -53,7 +53,7 @@ RUN apk add \
   zeromq
 
 RUN adduser -D -g bitcoin bitcoin \
-  && apk add su-exec
+  && apk add tini su-exec
 
 RUN mkdir \
   /var/lib/bitcoin \
@@ -63,5 +63,5 @@ RUN mkdir \
 
 COPY bitcoin.conf /etc/bitcoin.conf
 COPY entrypoint.sh /usr/bin/run
-ENTRYPOINT ["run"]
+ENTRYPOINT ["tini", "--", "run"]
 CMD ["bitcoin-node"]

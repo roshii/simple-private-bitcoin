@@ -20,10 +20,10 @@ cmd="$1"
 found=$(find "$scriptdir" -name "$cmd" -type f -print)
 
 if [ "$cmd" == "joinmarketd.py" ] ; then
-  su-exec "$user" python "$@"
+  exec su-exec "$user" python "$@"
 elif [ -n "$found" ] ; then
   shift
-  su-exec "$user" python "$cmd" "--datadir=${datadir}" "$@"
+  exec su-exec "$user" python "$cmd" "--datadir=${datadir}" "$@"
 else
-  su-exec "$user" "$@"
+  exec su-exec "$user" "$@"
 fi

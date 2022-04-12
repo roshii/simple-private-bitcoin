@@ -23,4 +23,4 @@ walletdir="/srv/wallet"
 
 cmd="$1"
 shift
-su-exec "$user" "$cmd" -datadir="$datadir" "$@"
+exec su-exec "$user" "$cmd" -datadir="$datadir" "$@"

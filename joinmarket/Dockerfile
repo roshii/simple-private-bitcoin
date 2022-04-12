@@ -43,12 +43,12 @@ RUN apk add libsodium \
   && pip install --no-cache /tmp/pip/*
 
 RUN adduser -D -g jm jm \
-  && apk add su-exec
+  && apk add tini su-exec
 
 WORKDIR /opt/jm
 COPY --from=builder /src/scripts /opt/jm
 COPY joinmarket.cfg /etc/joinmarket.cfg
 
 COPY entrypoint.sh /usr/bin/run
-ENTRYPOINT ["run"]
+ENTRYPOINT ["tini", "--", "run"]
 CMD ["joinmarketd.py"]

@@ -15,26 +15,26 @@ Clone project to local file system with [`git`](https://git-scm.com/).
 
 Start all services with a single command as follows.
 
-```sh
+```shell
 docker-compose up
 ```
 
 Bitcoin service will create a `joinmarket` wallet upon startup, used by joinmarket to _store addresses as watch-only_ in this wallet.
 Joinmarket wallet on the other hand has to be created interactively with the following commmand.
 
-```sh
+```shell
 docker-compose exec joinmarket run wallet-toool.py generate
 ```
 
 Yield generator can be started with the following command.
 
-```sh
-docker-compose exec joinmarket run yg-privacyenhanced.py generate
+```shell
+docker-compose exec joinmarket run yg-privacyenhanced.py
 ```
 
 ## Reindex blocks from existing volume.
 
-```sh
+```shell
 docker-compose run bitcoin -reindex
 ```
 

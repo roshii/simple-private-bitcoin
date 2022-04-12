@@ -1,5 +1,5 @@
 #!/bin/ash
-set -e
+set -ex
 
 user="jm"
 datadir="/srv"
@@ -19,11 +19,24 @@ chown -R "$user" "$datadir"
 cmd="$1"
 found=$(find "$scriptdir" -name "$cmd" -type f -print)
 
-if [ "$cmd" == "joinmarketd.py" ] ; then
-  exec su-exec "$user" python "$@"
-elif [ -n "$found" ] ; then
+# if [ "$cmd" == "yg-privacyenhanced.py" ] ; then
+#   shift
+#   exec su-exec "$user" python "$cmd" "--datadir=${datadir}" "$@" -p $(cat /run/secrets/yg-wallet-pwd)
+# elif [ -n "$found" ] ; then
+#   shift
+#   exec su-exec "$user" python "$cmd" "--datadir=${datadir}" "$@"
+# else
+#   exec su-exec "$user" "$@"
+# fi
+
+if [ -n "$found" ] ; then
   shift
-  exec su-exec "$user" python "$cmd" "--datadir=${datadir}" "$@"
+  CMD="exec su-exec ${user} python ${cmd} --datadir=${datadir} $@"
+  if [ "$cmd" == "yg-privacyenhanced.py" ] ; then
+    $CMD --wallet-password-stdin dev
+  else
+    $CMD
+  fi
 else
   exec su-exec "$user" "$@"
 fi

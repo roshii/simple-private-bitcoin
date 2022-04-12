@@ -1,3 +1,8 @@
+secrets:
+  yg-wallet-pwd:
+    file: ${JM_WALLET_NAME:-.secrets/yg-wallet-pwd}
+    name: yg-wallet-pwd
+
 services:
   tor:
     build:
@@ -30,17 +35,22 @@ services:
   joinmarket:
     build:
       args:
-        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.5}
+        JM_version_tag: ${JM_VERION_TAG:-v0.9.5}
       context: joinmarket
+    command: >
+      yg-privacyenhanced.py
+      ${JM_WALLET_NAME:-wallet.jmdat}
     container_name: joinmarket
     depends_on:
       - bitcoin
     image: joinmarket
+    secrets:
+      - yg-wallet-pwd
     networks:
       - private
     volumes:
       - bitcoin:/var/lib/bitcoin:ro
-      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
+      - ${JM_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
 
 networks:
   private:

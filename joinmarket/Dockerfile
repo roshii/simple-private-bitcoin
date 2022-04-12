@@ -51,4 +51,3 @@ COPY joinmarket.cfg /etc/joinmarket.cfg
 
 COPY entrypoint.sh /usr/bin/run
 ENTRYPOINT ["tini", "--", "run"]
-CMD ["joinmarketd.py"]

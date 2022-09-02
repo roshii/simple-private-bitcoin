@@ -3,7 +3,7 @@ services:
     build:
       context: tor
     container_name: tor
-    image: tor
+    image: r0shii/tor
     networks:
       - private
     volumes:
@@ -17,7 +17,7 @@ services:
     container_name: bitcoin
     depends_on:
       - tor
-    image: bitcoin
+    image: r0shii/bitcoin
     networks:
       - private
     volumes:
@@ -35,7 +35,7 @@ services:
     container_name: joinmarket
     depends_on:
       - bitcoin
-    image: joinmarket
+    image: r0shii/joinmarket
     networks:
       - private
     volumes:

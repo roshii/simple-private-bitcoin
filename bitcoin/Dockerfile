@@ -1,4 +1,4 @@
-ARG image_tag=3.15
+ARG image_tag=3.16
 FROM alpine:${image_tag} AS build-base
 WORKDIR /src
 RUN apk add \
@@ -29,7 +29,7 @@ RUN apk add \
   sqlite-dev \
   zeromq-dev
 
-ARG bitcoin_version_tag=v22.0
+ARG bitcoin_version_tag=v23.0
 RUN git clone --depth 1 --branch ${bitcoin_version_tag} \
   https://github.com/bitcoin/bitcoin.git .
 RUN ./autogen.sh \

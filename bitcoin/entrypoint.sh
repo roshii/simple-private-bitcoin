@@ -8,12 +8,16 @@ datadir="/srv/data"
 confdir="/home/${user}/.bitcoin"
 file_name="bitcoin.conf"
 target="${datadir}/${file_name}"
+link="${confdir}/${file_name}"
 
 
 if ! [ -f "$target" ]; then
   cp "/etc/${file_name}" "$datadir"
+fi
+
+if ! [ -f "${link}" ]; then
   mkdir -p "${confdir}"
-  ln -sf "$target" "${confdir}/${file_name}"
+  ln -sf "$target" "${link}"
 fi
 
 chown -R "$user" /var/lib/bitcoin

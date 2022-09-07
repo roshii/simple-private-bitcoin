@@ -1,4 +1,4 @@
-ARG image_tag=3.15
+ARG image_tag=3.16
 FROM python:3.10-alpine${image_tag} AS build-base
 WORKDIR /src
 RUN apk add \

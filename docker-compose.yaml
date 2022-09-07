@@ -12,7 +12,7 @@ services:
   bitcoin:
     build:
       args:
-        bitcoin_version_tag: ${BITCOIN_VERION_TAG:-v22.0}
+        bitcoin_version_tag: ${BITCOIN_VERION_TAG:-v23.0}
       context: bitcoin
     container_name: bitcoin
     depends_on:

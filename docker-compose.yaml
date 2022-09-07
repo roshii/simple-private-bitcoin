@@ -30,7 +30,7 @@ services:
   joinmarket:
     build:
       args:
-        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.5}
+        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.7}
       context: joinmarket
     container_name: joinmarket
     depends_on:

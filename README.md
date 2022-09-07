@@ -35,7 +35,7 @@ docker-compose exec joinmarket run yg-privacyenhanced.py generate
 ## Reindex blocks from existing volume.
 
 ```sh
-docker-compose run bitcoin -reindex
+docker-compose run -d --rm --name bitcoin bitcoin bitcoin-node -reindex
 ```
 
 ### Configuration

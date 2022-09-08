@@ -1,15 +1,16 @@
 services:
   tor:
+    image: r0shii/tor
     build:
       context: tor
     container_name: tor
-    image: tor
     networks:
       - private
     volumes:
       - tor:/var/lib/tor
     restart: unless-stopped
   bitcoin:
+    image: r0shii/bitcoin
     build:
       args:
         bitcoin_version_tag: ${BITCOIN_VERION_TAG:-v23.0}
@@ -17,7 +18,6 @@ services:
     container_name: bitcoin
     depends_on:
       - tor
-    image: bitcoin
     networks:
       - private
     volumes:
@@ -28,6 +28,7 @@ services:
         - ${BITCOIN_WALLET_MOUNTPOINT:-.data/bitcoin/wallet}:/srv/wallet
     restart: unless-stopped
   joinmarket:
+    image: r0shii/joinmarket
     build:
       args:
         joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.7}
@@ -35,7 +36,6 @@ services:
     container_name: joinmarket
     depends_on:
       - bitcoin
-    image: joinmarket
     networks:
       - private
     volumes:

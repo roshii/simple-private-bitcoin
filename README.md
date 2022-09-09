@@ -13,10 +13,7 @@ Clone project to local file system with [`git`](https://git-scm.com/).
 
 ## Usage
 
-1.   Pull containers' images from docker hub or build with either
-`docker-compose pull` or `docker-compose build` respectively.
-
-2.   Start all services with `docker-compose up -d`
+Start all services with `docker-compose up -d` which will pull images from DockerHub; if you rather build images from dockerfiles, run `docker-compose build` beforehand. 
 
 Bitcoin service will create a `joinmarket` wallet upon startup, used by joinmarket to _store addresses as watch-only_ in this wallet.
 Joinmarket wallet on the other hand has to be created interactively with the following commmand.

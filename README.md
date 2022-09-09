@@ -22,7 +22,7 @@ Bitcoin service will create a `joinmarket` wallet upon startup, used by joinmark
 Joinmarket wallet on the other hand has to be created interactively with the following commmand.
 
 ```shell
-docker-compose exec joinmarket run wallet-toool.py generate
+docker-compose exec joinmarket run wallet-tool.py generate
 ```
 
 Yield generator can be started with the following command.

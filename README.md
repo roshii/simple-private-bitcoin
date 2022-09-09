@@ -43,7 +43,7 @@ Bitcoin and JoinMarket data are persisted to local file system and can be config
 
 * `BITCOIN_BLOCKS_MOUNTPOINT`
 * `BITCOIN_DATA_MOUNTPOINT`
-* `BITCOIN_WALLET_MOUNTPOIN`
+* `BITCOIN_WALLET_MOUNTPOINT`
 * `JOINMARKET_DATA_MOUNTPOINT`
 
 ## Contributing

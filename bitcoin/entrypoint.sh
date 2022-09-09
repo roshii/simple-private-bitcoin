@@ -19,8 +19,7 @@ wallet="joinmarket"
 walletdir="/srv/wallet"
 
 ! [ -d "${walletdir}/${wallet}" ] \
-&& su-exec "$user" bitcoin-wallet -datadir="$walletdir" -wallet="$wallet" create
-
+&& su-exec "$user" bitcoin-wallet -datadir="$walletdir" -wallet="$wallet" -legacy create
 cmd="$1"
 shift
 exec su-exec "$user" "$cmd" -datadir="$datadir" "$@"

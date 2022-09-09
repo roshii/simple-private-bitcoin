@@ -1,7 +1,9 @@
 services:
   tor:
     image: r0shii/tor
+    pull_policy: always
     build:
+      pull: true
       context: tor
     container_name: tor
     networks:
@@ -11,7 +13,9 @@ services:
     restart: unless-stopped
   bitcoin:
     image: r0shii/bitcoin
+    pull_policy: always
     build:
+      pull: true
       args:
         bitcoin_version_tag: ${BITCOIN_VERION_TAG:-v23.0}
       context: bitcoin
@@ -29,7 +33,9 @@ services:
     restart: unless-stopped
   joinmarket:
     image: r0shii/joinmarket
+    pull_policy: always
     build:
+      pull: true
       args:
         joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.7}
       context: joinmarket

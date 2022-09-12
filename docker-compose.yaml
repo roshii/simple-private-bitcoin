@@ -1,6 +1,6 @@
 services:
   tor:
-    image: r0shii/tor
+    image: r0shii/tor:dev
     pull_policy: always
     build:
       pull: true
@@ -12,7 +12,7 @@ services:
       - tor:/var/lib/tor
     restart: unless-stopped
   bitcoin:
-    image: r0shii/bitcoin
+    image: r0shii/bitcoin:dev
     pull_policy: always
     build:
       pull: true
@@ -32,7 +32,7 @@ services:
         - ${BITCOIN_WALLET_MOUNTPOINT:-.data/bitcoin/wallet}:/srv/wallet
     restart: unless-stopped
   joinmarket:
-    image: r0shii/joinmarket
+    image: r0shii/joinmarket:dev
     pull_policy: always
     build:
       pull: true

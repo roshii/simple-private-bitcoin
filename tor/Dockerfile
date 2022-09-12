@@ -1,6 +1,9 @@
 ARG image_tag=3.16
 FROM alpine:${image_tag}
-RUN apk add tor
+RUN addgroup -g 918 satoshi \
+  && adduser -S -D -G satoshi -g tor tor \
+  && apk add tor \
+  && chgrp -R satoshi /var/lib/tor
 COPY torrc /etc/tor/torrc
-USER tor
+USER tor:satoshi
 ENTRYPOINT ["tor"]

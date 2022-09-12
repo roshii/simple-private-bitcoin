@@ -42,7 +42,8 @@ COPY --from=builder /srv /tmp/pip
 RUN apk add libsodium \
   && pip install --no-cache /tmp/pip/*
 
-RUN adduser -D -g jm jm \
+RUN addgroup -g 918 satoshi \
+  && adduser -D -G satoshi -g jm jm \
   && apk add tini su-exec
 
 WORKDIR /opt/jm

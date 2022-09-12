@@ -1,10 +1,15 @@
-DataDirectory /var/lib/tor
-
-SOCKSPort tor:9050
-
-SOCKSPolicy accept 10.3.1.0/24
-SOCKSPolicy reject *
+# General Options
 
 ControlPort tor:9051
 CookieAuthentication 1
+CookieAuthFile /var/lib/tor/control_auth_cookie
+CookieAuthFileGroupReadable 1
+
+DataDirectory /var/lib/tor
 DataDirectoryGroupReadable 1
+
+# Client Options
+
+SOCKSPort tor:9050
+SOCKSPolicy accept 10.3.1.0/24
+SOCKSPolicy reject *

@@ -46,6 +46,7 @@ services:
       - private
     volumes:
       - bitcoin:/var/lib/bitcoin:ro
+      - tor:/var/lib/tor:ro
       - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
 
 networks:

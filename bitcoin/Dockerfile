@@ -52,7 +52,8 @@ RUN apk add \
   sqlite-dev \
   zeromq
 
-RUN adduser -D -g bitcoin bitcoin \
+RUN addgroup -g 918 satoshi \
+  && adduser -D -G satoshi -g bitcoin bitcoin \
   && apk add tini su-exec
 
 RUN mkdir \

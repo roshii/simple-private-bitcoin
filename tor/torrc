@@ -11,5 +11,8 @@ DataDirectoryGroupReadable 1
 # Client Options
 
 SOCKSPort tor:9050
+SOCKSPort tor:9150
+SOCKSPort tor:9151
+SOCKSPort tor:9161
 SOCKSPolicy accept 10.3.1.0/24
 SOCKSPolicy reject *

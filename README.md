@@ -36,12 +36,12 @@ docker compose run -d bitcoin -reindex
 
 ### Configuration
 
-Bitcoin and JoinMarket data are persisted to local file system and can be configured with the following environment variables and which may be set in a `.env` file.
+Bitcoin and JoinMarket data are persisted to local file system and can be configured with the following environment variables and which may be set in a `.env` file. These data folders must exist before starting services, make sure to create any unexisting one.
 
-* `BITCOIN_BLOCKS_MOUNTPOINT`
-* `BITCOIN_DATA_MOUNTPOINT`
-* `BITCOIN_WALLET_MOUNTPOINT`
-* `JOINMARKET_DATA_MOUNTPOINT`
+* `BITCOIN_BLOCKS_MOUNTPOINT`, defaults to `./.data/bitcoin/blocks`
+* `BITCOIN_DATA_MOUNTPOINT`, defaults to `./.data/bitcoin/data`
+* `BITCOIN_WALLET_MOUNTPOINT`, defaults to `./.data/bitcoin/wallets`
+* `JOINMARKET_DATA_MOUNTPOINT`, defaults to `./.data/joinmarket`
 
 ## Contributing
 

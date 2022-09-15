@@ -64,5 +64,9 @@ RUN mkdir \
 
 COPY bitcoin.conf /etc/bitcoin.conf
 COPY entrypoint.sh /usr/bin/run
+
+HEALTHCHECK --start-period=20s --timeout=2s \
+  CMD bitcoin-cli --datadir=/srv/data -getinfo
+
 ENTRYPOINT ["tini", "--", "run"]
 CMD ["bitcoin-node"]

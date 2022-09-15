@@ -41,7 +41,8 @@ services:
       context: joinmarket
     container_name: joinmarket
     depends_on:
-      - bitcoin
+      bitcoin:
+        condition: service_healthy
     networks:
       - private
     volumes:

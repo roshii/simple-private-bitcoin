@@ -56,17 +56,13 @@ RUN addgroup -g 918 satoshi \
   && adduser -D -G satoshi -g bitcoin bitcoin \
   && apk add tini su-exec
 
-RUN mkdir \
-  /var/lib/bitcoin \
-  /srv/blocks \
-  /srv/data \
-  /srv/wallet
+RUN mkdir /blocks /var/lib/bitcoin
 
 COPY bitcoin.conf /etc/bitcoin.conf
 COPY entrypoint.sh /usr/bin/run
 
-HEALTHCHECK --start-period=20s --timeout=2s \
-  CMD bitcoin-cli --datadir=/srv/data -getinfo
+HEALTHCHECK --start-period=20s --interval=10s --timeout=5s \
+  CMD run bitcoin-cli -getinfo
 
 ENTRYPOINT ["tini", "--", "run"]
 CMD ["bitcoin-node"]

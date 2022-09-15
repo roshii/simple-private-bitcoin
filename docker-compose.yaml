@@ -51,6 +51,25 @@ services:
       - tor:/var/lib/tor:ro
       - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
 
+  lnd:
+    image: r0shii/lnd:dev
+    pull_policy: always
+    build:
+      pull: true
+      args:
+        lnd_version_tag: ${LND_VERION_TAG:-v0.15.1-beta}
+      context: lnd
+    container_name: lnd
+    depends_on:
+      bitcoin:
+        condition: service_healthy
+    networks:
+      - private
+    volumes:
+      - bitcoin:/var/lib/bitcoin:ro
+      - tor:/var/lib/tor:ro
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lnd/.lnd
+
 networks:
   private:
     driver: bridge

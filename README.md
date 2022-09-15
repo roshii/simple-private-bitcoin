@@ -41,6 +41,7 @@ Bitcoin and JoinMarket data are persisted to local file system and can be config
 * `BITCOIN_BLOCKS_MOUNTPOINT`, defaults to `./.data/bitcoin/.blocks`
 * `BITCOIN_DATA_MOUNTPOINT`, defaults to `./.data/bitcoin`
 * `JOINMARKET_DATA_MOUNTPOINT`, defaults to `./.data/joinmarket`
+* `LND_DATA_MOUNTPOINT`, defaults to `./.data/lnd`
 
 ## Contributing
 

@@ -7,9 +7,11 @@ services:
       context: tor
     container_name: tor
     networks:
-      - private
+      private:
+        ipv4_address: 10.3.1.2
     volumes:
       - tor:/var/lib/tor
+      - ${ONION_REST_LND_MOUNTPOINT:-.data/lnd/onion-rest}:/onion/lnd
     restart: unless-stopped
 
   bitcoin:
@@ -24,7 +26,8 @@ services:
     depends_on:
       - tor
     networks:
-      - private
+      private:
+        ipv4_address: 10.3.1.3
     volumes:
         - bitcoin:/var/lib/bitcoin
         - tor:/var/lib/tor:ro

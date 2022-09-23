@@ -1,25 +1,25 @@
 #!/bin/ash
 set -e
 
+# Defaults
 user="bitcoin"
+configfile="bitcoin.conf"
+datadir="/home/${user}/.bitcoin"
 
 # Copy default config if none is set
-datadir="/srv/data"
-file_name="bitcoin.conf"
-
-if ! [ -f "${datadir}/${file_name}" ]; then
-  cp "/etc/${file_name}" "$datadir"
+configfilepath="${datadir}/${configfile}"
+if ! [ -f "$configfilepath" ]; then
+  cp "/etc/${configfile}" "$datadir"
 fi
 
-chown -R "$user" /var/lib/bitcoin
-chown -R "$user" /srv
-
-# Create joinmarket wallet is None is present
+# Create joinmarket wallet if not existing
 wallet="joinmarket"
-walletdir="/srv/wallet"
+! [ -d "${datadir}/${wallet}" ] \
+&& su-exec "$user" bitcoin-wallet -wallet="$wallet" -legacy create
 
-! [ -d "${walletdir}/${wallet}" ] \
-&& su-exec "$user" bitcoin-wallet -datadir="$walletdir" -wallet="$wallet" -legacy create
-cmd="$1"
-shift
-exec su-exec "$user" "$cmd" -datadir="$datadir" "$@"
+# Set files and folders permissions
+chown -R "$user" "$datadir"
+chown -R "$user" /var/lib/bitcoin
+sleep 10 && chmod 640 /var/lib/bitcoin/.cookie &
+
+exec su-exec "$user" "$@"

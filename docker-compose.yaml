@@ -7,10 +7,12 @@ services:
       context: tor
     container_name: tor
     networks:
-      - private
+      private:
+        ipv4_address: 10.3.1.2
     volumes:
       - tor:/var/lib/tor
     restart: unless-stopped
+
   bitcoin:
     image: r0shii/bitcoin
     pull_policy: always
@@ -23,31 +25,53 @@ services:
     depends_on:
       - tor
     networks:
-      - private
+      private:
+        ipv4_address: 10.3.1.3
     volumes:
         - bitcoin:/var/lib/bitcoin
         - tor:/var/lib/tor:ro
-        - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/blocks}:/srv/blocks
-        - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin/data}:/srv/data
-        - ${BITCOIN_WALLET_MOUNTPOINT:-.data/bitcoin/wallet}:/srv/wallet
+        - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/.blocks}:/blocks
+        - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/bitcoin/.bitcoin
     restart: unless-stopped
+
   joinmarket:
     image: r0shii/joinmarket
     pull_policy: always
     build:
       pull: true
       args:
-        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.7}
+        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.8}
       context: joinmarket
     container_name: joinmarket
     depends_on:
-      - bitcoin
+      bitcoin:
+        condition: service_healthy
     networks:
       - private
     volumes:
       - bitcoin:/var/lib/bitcoin:ro
       - tor:/var/lib/tor:ro
       - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
+
+  lnd:
+    image: r0shii/lnd
+    pull_policy: always
+    build:
+      pull: true
+      args:
+        lnd_version_tag: ${LND_VERION_TAG:-v0.15.1-beta}
+        lndconnect_version_tag: ${LNDCONNECT_VERION_TAG:-9e8a23e}
+      context: lnd
+    container_name: lnd
+    depends_on:
+      bitcoin:
+        condition: service_healthy
+    networks:
+      - private
+    volumes:
+      - bitcoin:/var/lib/bitcoin:ro
+      - tor:/var/lib/tor:ro
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lnd/.lnd
 
 networks:
   private:

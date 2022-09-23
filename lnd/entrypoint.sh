@@ -13,4 +13,6 @@ if ! [ -f "$configfilepath" ]; then
   chown "$user" "$configfilepath"
 fi
 
+[[ -z $(pgrep lndconnect) ]] && su-exec "$user" lndconnect -c -o &
+
 exec su-exec "$user" "$@"

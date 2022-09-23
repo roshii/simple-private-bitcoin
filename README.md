@@ -15,18 +15,35 @@ Clone project to local file system with [`git`](https://git-scm.com/).
 
 Start all services with `docker compose up -d` which will pull images from DockerHub; if you rather build images from dockerfiles, run `docker compose build` beforehand. 
 
+### Joinmarkat
 Bitcoin service will create a `joinmarket` wallet upon startup, used by joinmarket to _store addresses as watch-only_ in this wallet.
-Joinmarket wallet on the other hand has to be created interactively with the following commmand.
-
+Joinmarket wallet on the other hand has to be created interactively with:
 ```shell
 docker compose exec joinmarket run wallet-tool.py generate
 ```
 
-Yield generator can be started with the following command.
-
+Yield generator can then be started with:
 ```shell
 docker compose exec joinmarket run yg-privacyenhanced.py
 ```
+
+### LND
+LND deamon will be started automatically as soon as `bitcoin` service is healthy. Its wallet must either be created or unlocked as follows to further interact with service. See [LND wallet documentation](https://github.com/lightningnetwork/lnd/blob/master/docs/wallet.md) for more information.
+
+
+Create a new wallet with:
+```shell
+docker compose exec lnd run lncli create
+```
+
+Unlock wallet with:
+```shell
+docker compose exec lnd run lncli unlock
+```
+
+#### LNDConnect
+
+`lnd` service ships a modified version of [`lndconect`](https://github.com/roshii/lndconnect) which will create a tor hidden service automatically with default configuration. An admnin connection QR code will be saved under lnd data directory. 
 
 ## Reindex blocks from existing volume.
 
@@ -36,12 +53,12 @@ docker compose run -d bitcoin -reindex
 
 ### Configuration
 
-Bitcoin and JoinMarket data are persisted to local file system and can be configured with the following environment variables and which may be set in a `.env` file.
+Bitcoin and JoinMarket data are persisted to local file system and can be configured with the following environment variables and which may be set in a `.env` file. These data folders must exist before starting services, make sure to create any unexisting one.
 
-* `BITCOIN_BLOCKS_MOUNTPOINT`
-* `BITCOIN_DATA_MOUNTPOINT`
-* `BITCOIN_WALLET_MOUNTPOINT`
-* `JOINMARKET_DATA_MOUNTPOINT`
+* `BITCOIN_BLOCKS_MOUNTPOINT`, defaults to `./.data/bitcoin/.blocks`
+* `BITCOIN_DATA_MOUNTPOINT`, defaults to `./.data/bitcoin`
+* `JOINMARKET_DATA_MOUNTPOINT`, defaults to `./.data/joinmarket`
+* `LND_DATA_MOUNTPOINT`, defaults to `./.data/lnd`
 
 ## Contributing
 

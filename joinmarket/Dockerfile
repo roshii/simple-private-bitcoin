@@ -23,7 +23,7 @@ RUN ./autogen.sh \
 FROM build-base AS builder
 RUN apk add libffi-dev openssl-dev
 
-ARG joinmarket_version_tag=v0.9.5
+ARG joinmarket_version_tag=v0.9.8
 RUN git clone --depth 1 --branch ${joinmarket_version_tag} \
   https://github.com/JoinMarket-Org/joinmarket-clientserver.git .
 RUN pip install --no-cache -U pip setuptools \

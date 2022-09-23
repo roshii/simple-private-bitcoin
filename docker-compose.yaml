@@ -11,7 +11,6 @@ services:
         ipv4_address: 10.3.1.2
     volumes:
       - tor:/var/lib/tor
-      - ${ONION_REST_LND_MOUNTPOINT:-.data/lnd/onion-rest}:/onion/lnd
     restart: unless-stopped
 
   bitcoin:
@@ -61,6 +60,7 @@ services:
       pull: true
       args:
         lnd_version_tag: ${LND_VERION_TAG:-v0.15.1-beta}
+        lndconnect_version_tag: ${LNDCONNECT_VERION_TAG:-9e8a23e}
       context: lnd
     container_name: lnd
     depends_on:

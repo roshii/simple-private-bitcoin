@@ -29,7 +29,7 @@ RUN apk add \
   sqlite-dev \
   zeromq-dev
 
-ARG bitcoin_version_tag=v22.0
+ARG bitcoin_version_tag=v23.0
 RUN git clone --depth 1 --branch ${bitcoin_version_tag} \
   https://github.com/bitcoin/bitcoin.git .
 RUN ./autogen.sh \

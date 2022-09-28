@@ -19,7 +19,7 @@ services:
     build:
       pull: true
       args:
-        bitcoin_version_tag: ${BITCOIN_VERION_TAG:-v23.0}
+        bitcoin_version_tag: v23.0
       context: bitcoin
     container_name: bitcoin
     depends_on:
@@ -40,7 +40,7 @@ services:
     build:
       pull: true
       args:
-        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.8}
+        joinmarket_version_tag: v0.9.8
       context: joinmarket
     container_name: joinmarket
     depends_on:
@@ -59,8 +59,8 @@ services:
     build:
       pull: true
       args:
-        lnd_version_tag: ${LND_VERION_TAG:-v0.15.1-beta}
-        lndconnect_version_tag: ${LNDCONNECT_VERION_TAG:-9e8a23e}
+        lnd_version_tag: v0.15.1-beta
+        lit_version_tag: v0.8.0-alpha
       context: lnd
     container_name: lnd
     depends_on:
@@ -72,6 +72,77 @@ services:
       - bitcoin:/var/lib/bitcoin:ro
       - tor:/var/lib/tor:ro
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lnd/.lnd
+    ports:
+      - "8443:8443"
+  lndconnect:
+    image: r0shii/lndconnect:dev
+    pull_policy: always
+    build:
+      pull: true
+      args:
+        version: latest
+      context: lndconnect
+    container_name: lndconnect
+    depends_on:
+      lnd:
+        condition: service_healthy
+    networks:
+      - private
+    volumes:
+      - tor:/var/lib/tor:ro
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lndconnect/.lnd:rw
+  pool:
+    image: r0shii/pool:dev
+    pull_policy: always
+    build:
+      pull: true
+      args:
+        VERSION_TAG: v0.5.8-alpha
+      context: pool
+    container_name: pool
+    depends_on:
+      lnd:
+        condition: service_healthy
+    networks:
+      - private
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/pool/.lnd:ro
+      - ${POOL_DATA_MOUNTPOINT:-.data/pool}:/home/pool/.pool
+  loop:
+    image: r0shii/loop:dev
+    pull_policy: always
+    build:
+      pull: true
+      args:
+        VERSION_TAG: v0.20.1-beta
+      context: loop
+    container_name: loop
+    depends_on:
+      lnd:
+        condition: service_healthy
+    networks:
+      - private
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/loop/.lnd:ro
+      - ${LOOP_DATA_MOUNTPOINT:-.data/loop}:/home/loop/.loop
+  lit:
+    image: r0shii/lit:dev
+    pull_policy: always
+    build:
+      pull: true
+      args:
+        version: v0.8.0-alpha
+      context: lit
+    container_name: lit
+    depends_on:
+      lnd:
+        condition: service_healthy
+    networks:
+      - private
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lit/.lnd:ro
+      - ${LIT_DATA_MOUNTPOINT:-.data/lit}:/home/lit/.lit
+
 
 networks:
   private:

@@ -43,7 +43,7 @@ docker compose exec lnd run lncli unlock
 
 #### LNDConnect
 
-`lnd` service ships a modified version of [`lndconect`](https://github.com/roshii/lndconnect) which will create a tor hidden service automatically with default configuration. An admnin connection QR code will be saved under lnd data directory. 
+`lnd` service ships a modified version of [`lndconnect`](https://github.com/roshii/lndconnect) which will create a tor hidden service automatically with default configuration. An admnin connection QR code will be saved under lnd data directory. 
 
 ## Reindex blocks from existing volume.
 

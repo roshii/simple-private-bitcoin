@@ -6,10 +6,11 @@ user="bitcoin"
 configfile="bitcoin.conf"
 datadir="/home/${user}/.bitcoin"
 
-# Copy default config if none is set
-configfilepath="${datadir}/${configfile}"
-if ! [ -f "$configfilepath" ]; then
+# Copy default config if none is found
+if ! [ -f "${datadir}/${configfile}" ]; then
+  mkdir -p "$datadir"
   cp "/etc/${configfile}" "$datadir"
+  chown -R "$user" "/home/${user}"
 fi
 
 # Create joinmarket wallet if not existing

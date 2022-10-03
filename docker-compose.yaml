@@ -97,8 +97,9 @@ services:
     build:
       pull: true
       args:
+        SERVICE: pool
         VERSION_TAG: v0.5.8-alpha
-      context: pool
+      context: lnlabs
     container_name: pool
     depends_on:
       lnd:
@@ -114,8 +115,9 @@ services:
     build:
       pull: true
       args:
+        SERVICE: loop
         VERSION_TAG: v0.20.1-beta
-      context: loop
+      context: lnlabs
     container_name: loop
     depends_on:
       lnd:
@@ -125,6 +127,24 @@ services:
     volumes:
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/loop/.lnd:ro
       - ${LOOP_DATA_MOUNTPOINT:-.data/loop}:/home/loop/.loop
+  faraday:
+    image: r0shii/faraday:dev
+    pull_policy: always
+    build:
+      pull: true
+      args:
+        SERVICE: faraday
+        VERSION_TAG: v0.2.8-alpha
+      context: lnlabs
+    container_name: faraday
+    depends_on:
+      lnd:
+        condition: service_healthy
+    networks:
+      - private
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/faraday/.lnd:ro
+      - ${FARADAY_DATA_MOUNTPOINT:-.data/faraday}:/home/faraday/.faraday
   lit:
     image: r0shii/lit:dev
     pull_policy: always

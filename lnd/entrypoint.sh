@@ -1,15 +1,14 @@
 #!/bin/ash
 set -e
 
-user="lnd"
 configfile="lnd.conf"
-datadir="/home/${user}/.lnd"
+datadir="/home/satoshi/.lnd"
 
 # Copy default config if none is found
 if ! [ -f "${datadir}/${configfile}" ]; then
   mkdir -p "$datadir"
   cp "/etc/${configfile}" "$datadir"
-  chown -R "$user" "/home/${user}"
+  chown -R satoshi /home/satoshi
 fi
 
-exec su-exec "$user" "$@"
+exec su-exec satoshi "$@"

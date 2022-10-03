@@ -1,16 +1,11 @@
-# Prepare final image
-ARG version_tag=v0.15.1-beta
-FROM lightninglabs/lnd:${version_tag}
+ARG VERSION_TAG=v0.15.1-beta
+FROM lightninglabs/lnd:${VERSION_TAG}
 
-RUN addgroup -g 918 satoshi \
-  && adduser -S -D -G satoshi -g lnd lnd \
-  && apk add tini su-exec
-
-COPY lnd.conf /etc/lnd.conf
-COPY entrypoint.sh /usr/bin/run
+RUN addgroup -g 913 nakamoto \
+  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
 HEALTHCHECK --start-period=120s --interval=60s --timeout=10s \
   CMD run lncli getinfo
 
-ENTRYPOINT ["tini", "--", "run"]
+USER satoshi:nakamoto
 CMD ["lnd"]

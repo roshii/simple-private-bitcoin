@@ -1,7 +1,6 @@
 #!/bin/ash
 set -e
 
-user="jm"
 datadir="/srv"
 scriptdir="/opt/jm"
 
@@ -13,17 +12,17 @@ if ! [ -f "$target" ]; then
   cp "/etc/${file_name}" "$datadir"
 fi
 
-chown -R "$user" "$datadir"
+chown -R satoshi "$datadir"
 
 # Add datadir flag for Joinmarket scripts
 cmd="$1"
 found=$(find "$scriptdir" -name "$cmd" -type f -print)
 
 if [ "$cmd" == "joinmarketd.py" ] ; then
-  exec su-exec "$user" python "$@"
+  exec su-exec satoshi python "$@"
 elif [ -n "$found" ] ; then
   shift
-  exec su-exec "$user" python "$cmd" "--datadir=${datadir}" "$@"
+  exec su-exec satoshi python "$cmd" "--datadir=${datadir}" "$@"
 else
-  exec su-exec "$user" "$@"
+  exec su-exec satoshi "$@"
 fi

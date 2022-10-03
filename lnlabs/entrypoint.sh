@@ -1,7 +1,6 @@
 #!/bin/ash
 set -e
 
-CONFIG_FILE="${LNLABS_SERVICE}d.conf"
 DATADIR="/home/${LNLABS_SERVICE}/.${LNLABS_SERVICE}"
 NETWORK="mainnet"
 CONFIGDIR="${DATADIR}/${NETWORK}"

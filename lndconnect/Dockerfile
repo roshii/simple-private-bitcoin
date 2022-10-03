@@ -4,13 +4,11 @@ ARG version=latest
 RUN go install github.com/roshii/lndconnect@${version}
 
 FROM alpine
+RUN addgroup -g 913 nakamoto \
+  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi \
+  && apk add tini su-exec
+
 COPY --from=builder /go/bin/lndconnect /bin/
 
-ARG user=lndconnect
-ARG group=statoshi
-
-RUN addgroup -g 918 "$group" \
-  && adduser -S -D -G "$group" -g "$user" "$user"
-
-USER "${user}:${group}"
+USER satoshi
 CMD ["lndconnect", "-c", "-o"]

@@ -17,5 +17,6 @@ SOCKSPort tor:9151
 SOCKSPort tor:9161
 SOCKSPort tor:9250
 SOCKSPort tor:9350
+SOCKSPort tor:9450
 SOCKSPolicy accept 10.3.1.0/24
 SOCKSPolicy reject *

@@ -1,10 +1,14 @@
 services:
   tor:
     image: r0shii/tor:dev
+    init: true
     pull_policy: always
     build:
       pull: true
       context: tor
+    configs:
+      - source: torrc
+        target: /etc/tor/torrc
     container_name: tor
     networks:
       private:
@@ -15,12 +19,16 @@ services:
 
   bitcoin:
     image: r0shii/bitcoin:dev
+    init: true
     pull_policy: always
     build:
       pull: true
       args:
-        bitcoin_version_tag: v23.0
+        VERSION_TAG: v23.0
       context: bitcoin
+    configs:
+      - source: bitcoin
+        target: /home/satoshi/.bitcoin/bitcoin.conf
     container_name: bitcoin
     depends_on:
       - tor
@@ -31,16 +39,17 @@ services:
         - bitcoin:/var/lib/bitcoin
         - tor:/var/lib/tor:ro
         - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/.blocks}:/blocks
-        - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/bitcoin/.bitcoin
+        - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/satoshi/.bitcoin
     restart: unless-stopped
 
   joinmarket:
     image: r0shii/joinmarket:dev
+    init: true
     pull_policy: always
     build:
       pull: true
       args:
-        joinmarket_version_tag: v0.9.8
+        VERSION_TAG: v0.9.8
       context: joinmarket
     container_name: joinmarket
     depends_on:
@@ -55,14 +64,17 @@ services:
 
   lnd:
     image: r0shii/lnd:dev
+    init: true
     pull_policy: always
     build:
       pull: true
       args:
-        lnd_version_tag: v0.15.1-beta
-        lit_version_tag: v0.8.0-alpha
+        VERSION_TAG: v0.15.1-beta
       context: lnd
     container_name: lnd
+    configs:
+      - source: bitcoin
+        target: /home/satoshi/.lnd/bitcoin.conf
     depends_on:
       bitcoin:
         condition: service_healthy
@@ -71,11 +83,10 @@ services:
     volumes:
       - bitcoin:/var/lib/bitcoin:ro
       - tor:/var/lib/tor:ro
-      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lnd/.lnd
-    ports:
-      - "8443:8443"
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd
   lndconnect:
     image: r0shii/lndconnect:dev
+    init: true
     pull_policy: always
     build:
       pull: true
@@ -93,6 +104,7 @@ services:
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lndconnect/.lnd:rw
   pool:
     image: r0shii/pool:dev
+    init: true
     pull_policy: always
     build:
       pull: true
@@ -100,6 +112,7 @@ services:
         SERVICE: pool
         VERSION_TAG: v0.5.8-alpha
       context: lnlabs
+      dockerfile: deamon.Dockerfile
     container_name: pool
     depends_on:
       lnd:
@@ -111,6 +124,7 @@ services:
       - ${POOL_DATA_MOUNTPOINT:-.data/pool}:/home/pool/.pool
   loop:
     image: r0shii/loop:dev
+    init: true
     pull_policy: always
     build:
       pull: true
@@ -118,6 +132,7 @@ services:
         SERVICE: loop
         VERSION_TAG: v0.20.1-beta
       context: lnlabs
+      dockerfile: deamon.Dockerfile
     container_name: loop
     depends_on:
       lnd:
@@ -129,6 +144,7 @@ services:
       - ${LOOP_DATA_MOUNTPOINT:-.data/loop}:/home/loop/.loop
   faraday:
     image: r0shii/faraday:dev
+    init: true
     pull_policy: always
     build:
       pull: true
@@ -136,6 +152,7 @@ services:
         SERVICE: faraday
         VERSION_TAG: v0.2.8-alpha
       context: lnlabs
+      dockerfile: deamon.Dockerfile
     container_name: faraday
     depends_on:
       lnd:
@@ -147,12 +164,14 @@ services:
       - ${FARADAY_DATA_MOUNTPOINT:-.data/faraday}:/home/faraday/.faraday
   lit:
     image: r0shii/lit:dev
+    init: true
     pull_policy: always
     build:
       pull: true
       args:
-        version: v0.8.0-alpha
-      context: lit
+        VERSION: v0.8.0-alpha
+      context: lnlabs
+      dockerfile: terminal.Dockerfile
     container_name: lit
     depends_on:
       lnd:
@@ -161,6 +180,9 @@ services:
       - private
     volumes:
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lit/.lnd:ro
+      - ${FARADAY_DATA_MOUNTPOINT:-.data/faraday}:/home/lit/.faraday:ro
+      - ${LOOP_DATA_MOUNTPOINT:-.data/loop}:/home/lit/.loop:ro
+      - ${POOL_DATA_MOUNTPOINT:-.data/pool}:/home/farlitaday/.pool:ro
       - ${LIT_DATA_MOUNTPOINT:-.data/lit}:/home/lit/.lit
 
 
@@ -174,3 +196,11 @@ networks:
 volumes:
   tor:
   bitcoin:
+
+configs:
+  torrc:
+    file: ./configs/torrc
+  bitcoin:
+    file: ./configs/bitcoin.conf
+  lnd:
+    file: ./configs/lnd.conf

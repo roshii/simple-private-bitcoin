@@ -1,5 +1,4 @@
-ARG image_tag=3.16
-FROM alpine:${image_tag} AS build-base
+FROM alpine AS build-base
 WORKDIR /src
 RUN apk add \
   autoconf \
@@ -8,6 +7,7 @@ RUN apk add \
   capnproto-dev \
   git \
   libtool
+
 
 FROM build-base AS libmultiprocess
 RUN apk add cmake
@@ -20,6 +20,7 @@ RUN mkdir build \
   && make -j $(nproc) \
   && make DESTDIR=/srv install
 
+
 FROM build-base AS builder
 COPY --from=libmultiprocess /srv /
 RUN apk add \
@@ -29,8 +30,8 @@ RUN apk add \
   sqlite-dev \
   zeromq-dev
 
-ARG bitcoin_version_tag=v23.0
-RUN git clone --depth 1 --branch ${bitcoin_version_tag} \
+ARG VERSION_TAG=v23.0
+RUN git clone --depth 1 --branch ${VERSION_TAG} \
   https://github.com/bitcoin/bitcoin.git .
 RUN ./autogen.sh \
   && ./configure \
@@ -41,28 +42,26 @@ RUN ./autogen.sh \
   --disable-fuzz-binary \
   --disable-bench \
   && make -j $(nproc) \
-  && make install
+  && make install \
+  && rm /srv/bin/bitcoind
 
-FROM alpine:${image_tag}
+FROM alpine
+RUN addgroup -g 913 nakamoto \
+  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
+
 COPY --from=builder /srv /usr
 RUN apk add \
-  boost1.77-filesystem \
+  boost1.78-filesystem \
   capnproto \
   libevent \
   sqlite-dev \
   zeromq
 
-RUN addgroup -g 918 satoshi \
-  && adduser -D -G satoshi -g bitcoin bitcoin \
-  && apk add tini su-exec
-
-RUN mkdir /blocks /var/lib/bitcoin
-
-COPY bitcoin.conf /etc/bitcoin.conf
-COPY entrypoint.sh /usr/bin/run
+RUN install -o satoshi -g nakamoto -d /blocks \
+  && install -o satoshi -g nakamoto -d /var/lib/bitcoin
 
 HEALTHCHECK --start-period=20s --interval=10s --timeout=5s \
   CMD run bitcoin-cli -getinfo
 
-ENTRYPOINT ["tini", "--", "run"]
+USER satoshi:nakamoto
 CMD ["bitcoin-node"]

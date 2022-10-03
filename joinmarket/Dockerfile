@@ -1,5 +1,4 @@
-ARG image_tag=3.16
-FROM python:3.10-alpine${image_tag} AS build-base
+FROM python:alpine AS build-base
 WORKDIR /src
 RUN apk add \
   autoconf \
@@ -23,8 +22,8 @@ RUN ./autogen.sh \
 FROM build-base AS builder
 RUN apk add libffi-dev openssl-dev
 
-ARG joinmarket_version_tag=v0.9.8
-RUN git clone --depth 1 --branch ${joinmarket_version_tag} \
+ARG VERSION_TAG=v0.9.8
+RUN git clone --depth 1 --branch ${VERSION_TAG} \
   https://github.com/JoinMarket-Org/joinmarket-clientserver.git .
 RUN pip install --no-cache -U pip setuptools \
   && pip wheel --no-cache --no-deps -w /srv \
@@ -36,20 +35,20 @@ RUN pip install --no-cache -U pip setuptools \
   urldecode \
   zope.interface
 
-FROM python:3.10-alpine${image_tag}
+FROM python:alpine
+RUN addgroup -g 913 nakamoto \
+  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi \
+  && apk add su-exec
+
 COPY --from=libsecp256k1 /srv /usr/local
 COPY --from=builder /srv /tmp/pip
 RUN apk add libsodium \
   && pip install --no-cache /tmp/pip/*
-
-RUN addgroup -g 918 satoshi \
-  && adduser -D -G satoshi -g jm jm \
-  && apk add tini su-exec
 
 WORKDIR /opt/jm
 COPY --from=builder /src/scripts /opt/jm
 COPY joinmarket.cfg /etc/joinmarket.cfg
 
 COPY entrypoint.sh /usr/bin/run
-ENTRYPOINT ["tini", "--", "run"]
+ENTRYPOINT ["run"]
 CMD ["joinmarketd.py"]

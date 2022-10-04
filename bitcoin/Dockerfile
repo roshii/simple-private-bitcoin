@@ -61,7 +61,7 @@ RUN install -o satoshi -g nakamoto -d /blocks \
   && install -o satoshi -g nakamoto -d /var/lib/bitcoin
 
 HEALTHCHECK --start-period=20s --interval=10s --timeout=5s \
-  CMD run bitcoin-cli -getinfo
+  CMD bitcoin-cli -getinfo
 
 USER satoshi:nakamoto
 CMD ["bitcoin-node"]

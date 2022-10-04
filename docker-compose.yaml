@@ -51,10 +51,15 @@ services:
       args:
         VERSION_TAG: v0.9.8
       context: joinmarket
+    configs:
+      - source: jm
+        target: /srv/joinmarket.cfg
     container_name: joinmarket
     depends_on:
       bitcoin:
         condition: service_healthy
+    profiles:
+      - do-not-start
     networks:
       - private
     volumes:
@@ -74,7 +79,7 @@ services:
     container_name: lnd
     configs:
       - source: bitcoin
-        target: /home/satoshi/.lnd/bitcoin.conf
+        target: /home/satoshi/.lnd/lnd.conf
     depends_on:
       bitcoin:
         condition: service_healthy
@@ -204,3 +209,5 @@ configs:
     file: ./configs/bitcoin.conf
   lnd:
     file: ./configs/lnd.conf
+  jm:
+    file: ./configs/joinmarket.cfg

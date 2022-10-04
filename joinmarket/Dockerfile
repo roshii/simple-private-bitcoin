@@ -28,17 +28,11 @@ RUN git clone --depth 1 --branch ${VERSION_TAG} \
 RUN pip install --no-cache -U pip setuptools \
   && pip wheel --no-cache --no-deps -w /srv \
   -r requirements/base.txt \
-  cffi \
-  cryptography==3.3.2 \
-  future \
-  pyaes \
-  urldecode \
-  zope.interface
+  cryptography==3.3.2
 
 FROM python:alpine
 RUN addgroup -g 913 nakamoto \
-  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi \
-  && apk add su-exec
+  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
 COPY --from=libsecp256k1 /srv /usr/local
 COPY --from=builder /srv /tmp/pip
@@ -46,9 +40,10 @@ RUN apk add libsodium \
   && pip install --no-cache /tmp/pip/*
 
 WORKDIR /opt/jm
-COPY --from=builder /src/scripts /opt/jm
-COPY joinmarket.cfg /etc/joinmarket.cfg
 
+USER satoshi:nakamoto
+
+COPY --from=builder /src/scripts /opt/jm
 COPY entrypoint.sh /usr/bin/run
 ENTRYPOINT ["run"]
 CMD ["joinmarketd.py"]

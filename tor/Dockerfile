@@ -6,4 +6,4 @@ RUN apk add tor \
   && chgrp -R nakamoto /var/lib/tor
 
 USER satoshi
-ENTRYPOINT ["tor"]
+CMD ["tor"]

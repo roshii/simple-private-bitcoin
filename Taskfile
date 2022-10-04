@@ -1,0 +1,52 @@
+#!/bin/bash
+
+COMPOSE="docker compose"
+FROM=(alpine:latest python:alpine golang:alpine node:alpine)
+ALL=(tor bitcoin lnd joinmarket)
+
+function build {
+    $COMPOSE build "$1"
+}
+
+function push {
+    build $1
+    docker push "r0shii/${1}:dev"
+}
+
+function build-all {
+    for service in "${ALL[@]}"
+    do
+        build "$service"
+    done
+}
+
+function push-all {
+    build-all
+    for service in "${ALL[@]}"
+    do
+        push ${service} &
+    done
+    wait
+}
+
+function pull {
+    for img in "${FROM[@]}"
+    do
+        docker pull "$img" &
+    done
+    wait
+}
+
+function default {
+    pull
+    push-all
+}
+
+function help {
+    echo "$0 <task> <args>"
+    echo "Tasks:"
+    compgen -A function | cat -n
+}
+
+TIMEFORMAT="Task completed in %3lR"
+time ${@:-default}

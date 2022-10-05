@@ -13,17 +13,6 @@ RUN make install
 
 FROM alpine
 RUN addgroup -g 913 nakamoto \
-  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi \
-  && apk add tini su-exec
+  && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
 COPY --from=builder /go/bin/* /bin/
-
-ARG SERVICE
-ARG GROUP="statoshi"
-ENV LNLABS_SERVICE="$SERVICE"
-ENV CONFIG_FILE="${SERVICE}d.conf"
-
-COPY "$CONFIG_FILE" /etc/
-COPY entrypoint.sh /usr/bin/run
-
-ENTRYPOINT ["tini", "--", "run"]

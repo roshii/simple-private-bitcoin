@@ -60,6 +60,12 @@ Bitcoin and JoinMarket data are persisted to local file system and can be config
 * `JOINMARKET_DATA_MOUNTPOINT`, defaults to `./.data/joinmarket`
 * `LND_DATA_MOUNTPOINT`, defaults to `./.data/lnd`
 
+#### Fix file permissions
+
+```shell
+docker run --rm -v $(pwd)/.data:/srv alpine chown -R 913:913 /srv 
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

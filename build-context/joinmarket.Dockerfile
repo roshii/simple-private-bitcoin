@@ -44,6 +44,6 @@ WORKDIR /opt/jm
 USER satoshi:nakamoto
 
 COPY --from=builder /src/scripts /opt/jm
-COPY entrypoint.sh /usr/bin/run
+COPY joinmarket.entrypoint.sh /usr/bin/run
 ENTRYPOINT ["run"]
 CMD ["joinmarketd.py"]

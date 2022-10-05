@@ -1,0 +1,23 @@
+version: "3"
+
+vars:
+  COMPOSE: "docker compose"
+  FROM: "alpine:latest python:alpine golang:alpine node:alpine lightninglabs/lnd:v0.15.1-beta"
+
+tasks:
+  pull:
+    desc: Pull base images
+    cmds:
+      - for IMAGE in {{.FROM}}; do docker pull -q "$IMAGE" & done; wait
+
+  build:
+    desc: Build service image(s)
+    cmds:
+      - "{{.COMPOSE}} build {{.CLI_ARGS}}"
+
+  push:
+    desc: Push service image(s)
+    cmds:
+      - task: build
+      - "{{.COMPOSE}} push {{.CLI_ARGS}}"
+

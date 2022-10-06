@@ -21,3 +21,9 @@ tasks:
       - task: build
       - "{{.COMPOSE}} push {{.CLI_ARGS}}"
 
+  push-one:
+    desc: Push service image(s)
+    cmds:
+      - task: build
+      - "docker push r0shii/{{.CLI_ARGS}}:dev"
+

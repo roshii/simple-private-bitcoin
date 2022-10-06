@@ -15,6 +15,8 @@ FROM alpine
 RUN addgroup -g 913 -S nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
+RUN install -o satoshi -g nakamoto -d /home/satoshi/.pool \
+  && install -o satoshi -g nakamoto -d /home/satoshi/.pool/mainnet
+
 COPY --from=builder /go/bin/* /bin/
-COPY lnlabs.entrypoint.sh /bin/run
-ENTRYPOINT ["run"]
+USER satoshi:nakamoto

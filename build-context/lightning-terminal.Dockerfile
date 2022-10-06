@@ -21,8 +21,9 @@ RUN make go-install-cli && make go-install
 
 # Final image
 FROM alpine
-RUN addgroup -g 913 nakamoto \
+RUN addgroup -g 913 -S nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
 COPY --from=builder /go/bin/* /bin/
+USER satoshi:nakamoto
 CMD ["litd"]

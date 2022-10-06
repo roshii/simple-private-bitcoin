@@ -12,7 +12,9 @@ RUN git clone --depth 1 --branch "${VERSION_TAG}" \
 RUN make install
 
 FROM alpine
-RUN addgroup -g 913 nakamoto \
+RUN addgroup -g 913 -S nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
 COPY --from=builder /go/bin/* /bin/
+COPY lnlabs.entrypoint.sh /bin/run
+ENTRYPOINT ["run"]

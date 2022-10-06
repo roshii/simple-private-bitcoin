@@ -1,15 +1,23 @@
+version: "3.8"
+
+x-defaults: &defaults
+  init: true
+  pull_policy: always
+  networks:
+    - private
+  restart: unless-stopped    
+
+x-build-defaults: &build-defaults
+  context: ./build-context
+  pull: true
+
+x-lnd-service-defaults: &lnd-service-defaults
+  <<: *defaults 
+  depends_on:
+    lnd:
+      condition: service_healthy
+
 services:
-  defaults: &defaults
-    init: true
-    pull_policy: always
-    networks:
-      - private
-    restart: unless-stopped    
-
-  build-defaults: &build-defaults
-    context: ./build-context
-    pull: true
-
   tor:
     <<: *defaults
     image: r0shii/tor:dev
@@ -43,12 +51,11 @@ services:
     networks:
       private:
         ipv4_address: 10.3.1.3
-    volumes_from:
-        - tor:ro
     volumes:
-        - bitcoin:/var/lib/bitcoin
-        - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/.blocks}:/blocks
-        - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/satoshi/.bitcoin
+      - tor:/var/lib/tor:ro
+      - bitcoin:/var/lib/bitcoin
+      - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/.blocks}:/blocks
+      - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/satoshi/.bitcoin
 
   joinmarket:
     profiles:
@@ -67,10 +74,9 @@ services:
     depends_on:
       bitcoin:
         condition: service_healthy
-    volumes_from:
-        - tor:ro
-        - bitcoin:ro
     volumes:
+      - tor:/var/lib/tor:ro
+      - bitcoin:/var/lib/bitcoin:ro
       - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
 
   lnd:
@@ -80,7 +86,7 @@ services:
       <<: *build-defaults
       args:
         VERSION_TAG: v0.15.1-beta
-      dockerfile: lnd
+      dockerfile: lnd.Dockerfile
     container_name: lnd
     configs:
       - source: lnd
@@ -88,10 +94,9 @@ services:
     depends_on:
       bitcoin:
         condition: service_healthy
-    volumes_from:
-        - tor:ro
-        - bitcoin:ro
     volumes:
+      - tor:/var/lib/tor:ro
+      - bitcoin:/var/lib/bitcoin:ro
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd
 
   lndconnect:
@@ -104,73 +109,87 @@ services:
     depends_on:
       lnd:
         condition: service_healthy
-    volumes_from:
-        - tor:ro
-        - lnd:rw
+    volumes:
+      - tor:/var/lib/tor:ro
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd
 
-  lnlabs-defaults: &lnlabs-defaults
-    <<: *defaults 
+  pool:
+    <<: *lnd-service-defaults
+    image: r0shii/pool:dev
+    build:
+      <<: *build-defaults
+      args:
+        SERVICE: pool
+        VERSION_TAG: v0.5.8-alpha
+      dockerfile: lnlabs-deamon.Dockerfile
+    command: poold
+    container_name: pool
+    configs:
+      - source: pool
+        target: /home/satoshi/.pool/mainnet/poold.conf
+        mode: 0777
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
+      - pool:/home/satoshi/.pool
+
+  loop:
+    <<: *lnd-service-defaults
+    image: r0shii/loop:dev
+    build:
+      <<: *build-defaults
+      args:
+        SERVICE: loop
+        VERSION_TAG: v0.20.1-beta
+      dockerfile: lnlabs-deamon.Dockerfile
+    command: loopd
+    container_name: loop
+    configs:
+      - source: loop
+        target: /home/satoshi/.loop/mainnet/loopd.conf
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
+      - loop:/home/satoshi/.loop
+  
+  faraday:
+    <<: *lnd-service-defaults
+    image: r0shii/faraday:dev
+    build:
+      <<: *build-defaults
+      args:
+        SERVICE: faraday
+        VERSION_TAG: v0.2.8-alpha
+      dockerfile: lnlabs-deamon.Dockerfile
+    command: faraday
+    container_name: faraday
+    configs:
+      - source: faraday
+        target: /home/satoshi/.faraday/mainnet/faraday.conf
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
+      - faraday:/home/satoshi/.faraday
+  
+  lightning-terminal:
+    <<: *lnd-service-defaults
+    image: r0shii/lightning-terminal:dev
+    build:
+      <<: *build-defaults
+      args:
+        VERSION: v0.8.0-alpha
+      dockerfile: lightning-terminal.Dockerfile
+    container_name: lightning-terminal
+    configs:
+      - source: lightning-terminal
+        target: /home/satoshi/.lit/mainnet/litd.conf
     depends_on:
-      lnd:
-        condition: service_healthy
-    volumes_from:
-        - lnd:ro
-
-  # pool:
-  #   <<: *lnlabs-defaults
-  #   image: r0shii/pool:dev
-  #   build:
-  #     <<: *build-defaults
-  #     args:
-  #       SERVICE: pool
-  #       VERSION_TAG: v0.5.8-alpha
-  #     dockerfile: lnlabs-deamon.Dockerfile
-  #   container_name: pool
-  #   volumes:
-  #     - ${POOL_DATA_MOUNTPOINT:-.data/pool}:/home/satoshi/.pool
-
-  # loop:
-  #   <<: *lnlabs-defaults
-  #   image: r0shii/loop:dev
-  #   build:
-  #     <<: *build-defaults
-  #     args:
-  #       SERVICE: loop
-  #       VERSION_TAG: v0.20.1-beta
-  #     dockerfile: lnlabs-deamon.Dockerfile
-  #   container_name: loop
-  #   volumes:
-  #     - ${LOOP_DATA_MOUNTPOINT:-.data/loop}:/home/satoshi/.loop
-  
-  # faraday:
-  #   <<: *lnlabs-defaults
-  #   image: r0shii/faraday:dev
-  #   build:
-  #     <<: *build-defaults
-  #     args:
-  #       SERVICE: faraday
-  #       VERSION_TAG: v0.2.8-alpha
-  #     dockerfile: lnlabs-deamon.Dockerfile
-  #   container_name: faraday
-  #   volumes:
-  #     - ${FARADAY_DATA_MOUNTPOINT:-.data/faraday}:/home/satoshi/.faraday
-  
-  # lightning-terminal:
-  #   <<: *lnlabs-defaults
-  #   image: r0shii/lightning-terminal:dev
-  #   build:
-  #     <<: *build-defaults
-  #     args:
-  #       VERSION: v0.8.0-alpha
-  #     dockerfile: lightning-terminal.Dockerfile
-  #   container_name: lightning-terminal
-  #   volumes_from:
-  #     - faraday:ro
-  #     - loop:ro
-  #     - pool:ro
-  #   volumes:
-  #     - ${LIT_DATA_MOUNTPOINT:-.data/lightning-terminal}:/home/satoshi/.lit
-
+      - pool
+      - loop
+      - faraday
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
+      - faraday:/home/satoshi/.faraday:ro
+      - loop:/home/satoshi/.loop:ro
+      - pool:/home/satoshi/.pool:ro
+      - lit:/home/satoshi/.lit
 
 networks:
   private:
@@ -182,6 +201,10 @@ networks:
 volumes:
   tor:
   bitcoin:
+  pool:
+  loop:
+  faraday:
+  lit:
 
 configs:
   torrc:
@@ -192,3 +215,11 @@ configs:
     file: ./configs/lnd.conf
   jm:
     file: ./configs/joinmarket.cfg
+  pool:
+    file: ./configs/poold.conf
+  loop:
+    file: ./configs/loopd.conf
+  faraday:
+    file: ./configs/faraday.conf
+  lightning-terminal:
+    file: ./configs/lit.conf

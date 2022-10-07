@@ -1,26 +1,50 @@
+version: "3.8"
+
+x-defaults: &defaults
+  init: true
+  pull_policy: always
+  networks:
+    - private
+  restart: unless-stopped    
+
+x-build-defaults: &build-defaults
+  context: ./build-context
+  pull: true
+
+x-lnd-service-defaults: &lnd-service-defaults
+  <<: *defaults 
+  depends_on:
+    lnd:
+      condition: service_healthy
+
 services:
   tor:
+    <<: *defaults
     image: r0shii/tor:dev
-    pull_policy: always
     build:
-      pull: true
-      context: tor
+      <<: *build-defaults
+      dockerfile: tor.Dockerfile
+    configs:
+      - source: torrc
+        target: /etc/tor/torrc
     container_name: tor
     networks:
       private:
         ipv4_address: 10.3.1.2
     volumes:
       - tor:/var/lib/tor
-    restart: unless-stopped
 
   bitcoin:
+    <<: *defaults
     image: r0shii/bitcoin:dev
-    pull_policy: always
     build:
-      pull: true
+      <<: *build-defaults
       args:
-        bitcoin_version_tag: ${BITCOIN_VERION_TAG:-v23.0}
-      context: bitcoin
+        VERSION_TAG: v23.0
+      dockerfile: bitcoin.Dockerfile
+    configs:
+      - source: bitcoin
+        target: /home/satoshi/.bitcoin/bitcoin.conf
     container_name: bitcoin
     depends_on:
       - tor
@@ -28,50 +52,85 @@ services:
       private:
         ipv4_address: 10.3.1.3
     volumes:
-        - bitcoin:/var/lib/bitcoin
-        - tor:/var/lib/tor:ro
-        - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/.blocks}:/blocks
-        - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/bitcoin/.bitcoin
-    restart: unless-stopped
+      - tor:/var/lib/tor:ro
+      - bitcoin:/var/lib/bitcoin
+      - ${BITCOIN_BLOCKS_MOUNTPOINT:-.data/bitcoin/.blocks}:/blocks
+      - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/satoshi/.bitcoin
 
   joinmarket:
+    profiles:
+    - do-not-start
+    <<: *defaults
     image: r0shii/joinmarket:dev
-    pull_policy: always
     build:
-      pull: true
+      <<: *build-defaults
       args:
-        joinmarket_version_tag: ${JOINMARKET_VERION_TAG:-v0.9.8}
-      context: joinmarket
+        VERSION_TAG: v0.9.8
+      dockerfile: joinmarket.Dockerfile
+    command: python yg-privacyenhanced.py --datadir=/srv wallet.jmdat
+    configs:
+      - source: jm
+        target: /srv/joinmarket.cfg
     container_name: joinmarket
     depends_on:
       bitcoin:
         condition: service_healthy
-    networks:
-      - private
     volumes:
-      - bitcoin:/var/lib/bitcoin:ro
       - tor:/var/lib/tor:ro
+      - bitcoin:/var/lib/bitcoin:ro
       - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
 
   lnd:
+    <<: *defaults
     image: r0shii/lnd:dev
-    pull_policy: always
     build:
-      pull: true
+      <<: *build-defaults
       args:
-        lnd_version_tag: ${LND_VERION_TAG:-v0.15.1-beta}
-        lndconnect_version_tag: ${LNDCONNECT_VERION_TAG:-9e8a23e}
-      context: lnd
+        VERSION_TAG: v0.15.1-beta
+      dockerfile: lnd.Dockerfile
     container_name: lnd
+    configs:
+      - source: lnd
+        target: /home/satoshi/.lnd/lnd.conf
     depends_on:
       bitcoin:
         condition: service_healthy
-    networks:
-      - private
     volumes:
-      - bitcoin:/var/lib/bitcoin:ro
       - tor:/var/lib/tor:ro
-      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/lnd/.lnd
+      - bitcoin:/var/lib/bitcoin:ro
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd
+    secrets:
+      - lnd-wallet-unlock-password
+
+  lndconnect:
+    <<: *lnd-service-defaults
+    image: r0shii/lndconnect:dev
+    build:
+      <<: *build-defaults
+      dockerfile: lndconnect.Dockerfile
+    container_name: lndconnect
+    volumes:
+      - tor:/var/lib/tor:ro
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd
+
+  lit:
+    <<: *lnd-service-defaults
+    image: r0shii/lightning-terminal:dev
+    build:
+      <<: *build-defaults
+      args:
+        VERSION: v0.8.0-alpha
+      dockerfile: lit.Dockerfile
+    container_name: lightning-terminal
+    configs:
+      - source: lit
+        target: /home/satoshi/.lit/lit.conf
+    ports:
+      - "8443:8443"
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
+    secrets:
+      - lit-ui-password
 
 networks:
   private:
@@ -83,3 +142,25 @@ networks:
 volumes:
   tor:
   bitcoin:
+  pool:
+  loop:
+  faraday:
+  lit:
+
+configs:
+  torrc:
+    file: ./configs/torrc
+  bitcoin:
+    file: ./configs/bitcoin.conf
+  lnd:
+    file: ./configs/lnd.conf
+  jm:
+    file: ./configs/joinmarket.cfg
+  lit:
+    file: ./configs/lit.conf
+
+secrets:
+  lnd-wallet-unlock-password:
+    file: ${SECRET_DATA_MOUNTPOINT:-.secrets}/lnd-wallet-unlock-password
+  lit-ui-password:
+    file: ${SECRET_DATA_MOUNTPOINT:-.secrets}/lit-ui-password

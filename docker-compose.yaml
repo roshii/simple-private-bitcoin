@@ -67,6 +67,7 @@ services:
       args:
         VERSION_TAG: v0.9.8
       dockerfile: joinmarket.Dockerfile
+    command: python yg-privacyenhanced.py --datadir=/srv wallet.jmdat
     configs:
       - source: jm
         target: /srv/joinmarket.cfg
@@ -159,11 +160,8 @@ services:
         SERVICE: faraday
         VERSION_TAG: v0.2.8-alpha
       dockerfile: lnlabs-deamon.Dockerfile
-    command: faraday
+    command: faraday --lnd.host=lnd:10009
     container_name: faraday
-    configs:
-      - source: faraday
-        target: /home/satoshi/.faraday/mainnet/faraday.conf
     volumes:
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
       - faraday:/home/satoshi/.faraday
@@ -179,7 +177,7 @@ services:
     container_name: lightning-terminal
     configs:
       - source: lightning-terminal
-        target: /home/satoshi/.lit/mainnet/litd.conf
+        target: /home/satoshi/.lit/lit.conf
     depends_on:
       - pool
       - loop
@@ -219,7 +217,5 @@ configs:
     file: ./configs/poold.conf
   loop:
     file: ./configs/loopd.conf
-  faraday:
-    file: ./configs/faraday.conf
   lightning-terminal:
     file: ./configs/lit.conf

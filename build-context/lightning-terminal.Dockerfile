@@ -24,6 +24,8 @@ FROM alpine
 RUN addgroup -g 913 -S nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
+RUN install -o satoshi -g nakamoto -d /home/satoshi/.lit
+
 COPY --from=builder /go/bin/* /bin/
 USER satoshi:nakamoto
 CMD ["litd"]

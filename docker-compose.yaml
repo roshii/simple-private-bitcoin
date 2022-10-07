@@ -99,95 +99,38 @@ services:
       - tor:/var/lib/tor:ro
       - bitcoin:/var/lib/bitcoin:ro
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd
+    secrets:
+      - lnd-wallet-unlock-password
 
   lndconnect:
-    <<: *defaults
+    <<: *lnd-service-defaults
     image: r0shii/lndconnect:dev
     build:
       <<: *build-defaults
       dockerfile: lndconnect.Dockerfile
     container_name: lndconnect
-    depends_on:
-      lnd:
-        condition: service_healthy
     volumes:
       - tor:/var/lib/tor:ro
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd
 
-  pool:
-    <<: *lnd-service-defaults
-    image: r0shii/pool:dev
-    build:
-      <<: *build-defaults
-      args:
-        SERVICE: pool
-        VERSION_TAG: v0.5.8-alpha
-      dockerfile: lnlabs-deamon.Dockerfile
-    command: poold
-    container_name: pool
-    configs:
-      - source: pool
-        target: /home/satoshi/.pool/mainnet/poold.conf
-        mode: 0777
-    volumes:
-      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
-      - pool:/home/satoshi/.pool
-
-  loop:
-    <<: *lnd-service-defaults
-    image: r0shii/loop:dev
-    build:
-      <<: *build-defaults
-      args:
-        SERVICE: loop
-        VERSION_TAG: v0.20.1-beta
-      dockerfile: lnlabs-deamon.Dockerfile
-    command: loopd
-    container_name: loop
-    configs:
-      - source: loop
-        target: /home/satoshi/.loop/mainnet/loopd.conf
-    volumes:
-      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
-      - loop:/home/satoshi/.loop
-  
-  faraday:
-    <<: *lnd-service-defaults
-    image: r0shii/faraday:dev
-    build:
-      <<: *build-defaults
-      args:
-        SERVICE: faraday
-        VERSION_TAG: v0.2.8-alpha
-      dockerfile: lnlabs-deamon.Dockerfile
-    command: faraday --lnd.host=lnd:10009
-    container_name: faraday
-    volumes:
-      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
-      - faraday:/home/satoshi/.faraday
-  
-  lightning-terminal:
+  lit:
     <<: *lnd-service-defaults
     image: r0shii/lightning-terminal:dev
     build:
       <<: *build-defaults
       args:
         VERSION: v0.8.0-alpha
-      dockerfile: lightning-terminal.Dockerfile
+      dockerfile: lit.Dockerfile
     container_name: lightning-terminal
     configs:
-      - source: lightning-terminal
+      - source: lit
         target: /home/satoshi/.lit/lit.conf
-    depends_on:
-      - pool
-      - loop
-      - faraday
+    ports:
+      - "8443:8443"
     volumes:
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
-      - faraday:/home/satoshi/.faraday:ro
-      - loop:/home/satoshi/.loop:ro
-      - pool:/home/satoshi/.pool:ro
-      - lit:/home/satoshi/.lit
+    secrets:
+      - lit-ui-password
 
 networks:
   private:
@@ -213,9 +156,11 @@ configs:
     file: ./configs/lnd.conf
   jm:
     file: ./configs/joinmarket.cfg
-  pool:
-    file: ./configs/poold.conf
-  loop:
-    file: ./configs/loopd.conf
-  lightning-terminal:
+  lit:
     file: ./configs/lit.conf
+
+secrets:
+  lnd-wallet-unlock-password:
+    file: ${SECRET_DATA_MOUNTPOINT:-.secrets}/lnd-wallet-unlock-password
+  lit-ui-password:
+    file: ${SECRET_DATA_MOUNTPOINT:-.secrets}/lit-ui-password

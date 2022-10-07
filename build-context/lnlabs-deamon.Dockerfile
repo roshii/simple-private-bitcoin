@@ -15,8 +15,9 @@ FROM alpine
 RUN addgroup -g 913 -S nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
-RUN install -o satoshi -g nakamoto -d /home/satoshi/.pool \
-  && install -o satoshi -g nakamoto -d /home/satoshi/.pool/mainnet
+ARG SERVICE
+RUN install -o satoshi -g nakamoto -d "/home/satoshi/.${SERVICE}" \
+  && install -o satoshi -g nakamoto -d "/home/satoshi/.${SERVICE}/mainnet"
 
 COPY --from=builder /go/bin/* /bin/
 USER satoshi:nakamoto

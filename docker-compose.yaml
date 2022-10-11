@@ -131,6 +131,10 @@ services:
       - "8443:8443"
     volumes:
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
+      - faraday:/home/satoshi/.faraday
+      - lit:/home/satoshi/.lit
+      - loop:/home/satoshi/.loop
+      - pool:/home/satoshi/.pool
     secrets:
       - lit-ui-password
 
@@ -144,10 +148,10 @@ networks:
 volumes:
   tor:
   bitcoin:
-  pool:
-  loop:
   faraday:
   lit:
+  loop:
+  pool:
 
 configs:
   torrc:

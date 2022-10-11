@@ -103,6 +103,8 @@ services:
       - lnd-wallet-unlock-password
 
   lndconnect:
+    profiles:
+    - do-not-start
     <<: *lnd-service-defaults
     image: r0shii/lndconnect:dev
     build:

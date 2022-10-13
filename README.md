@@ -5,6 +5,9 @@ Simple, self-hosted and self-managed containerized Bitcoin services definition.
 * tor proxy
 * bitcoin node
 * joinmarket
+* lnd
+* lndconnect
+* lightning-terminal
 
 ## Installation
 
@@ -33,17 +36,16 @@ LND deamon will be started automatically as soon as `bitcoin` service is healthy
 
 Create a new wallet with:
 ```shell
-docker compose exec lnd run lncli create
+docker compose run -it --rm lnd lncli create
 ```
 
-Unlock wallet with:
-```shell
-docker compose exec lnd run lncli unlock
-```
+### LNDConnect
 
-#### LNDConnect
+[`lndconnect`](https://github.com/roshii/lndconnect) which does n0ot start automatically, will create a tor hidden service automatically with default configuration. An admnin connection QR code will be saved under lnd data directory. 
 
-`lnd` service ships a modified version of [`lndconnect`](https://github.com/roshii/lndconnect) which will create a tor hidden service automatically with default configuration. An admnin connection QR code will be saved under lnd data directory. 
+### Lightning Terminal
+
+[`lit`](https://docs.lightning.engineering/lightning-network-tools/lightning-terminal) service will start automatically and allow you to interact with your lnd node at `https://your-host:8443`
 
 ## Reindex blocks from existing volume.
 

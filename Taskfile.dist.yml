@@ -2,7 +2,7 @@ version: "3"
 
 vars:
   COMPOSE: "docker compose"
-  FROM: "alpine:latest python:alpine golang:alpine node:alpine lightninglabs/lnd:v0.15.1-beta"
+  FROM: "alpine:latest python:alpine golang:alpine node:alpine lightninglabs/lnd:v0.15.2-beta"
 
 tasks:
   pull:

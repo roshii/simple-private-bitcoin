@@ -1,7 +1,8 @@
 FROM python:alpine AS builder
 RUN apk add \
   build-base \
-  git
+  git \
+  linux-headers
 
 WORKDIR /srv
 

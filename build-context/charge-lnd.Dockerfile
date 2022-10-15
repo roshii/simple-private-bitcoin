@@ -24,4 +24,3 @@ COPY --from=builder /whl /whl
 RUN pip install --no-cache /whl/*
 
 USER satoshi:nakamoto
-WORKDIR /srv

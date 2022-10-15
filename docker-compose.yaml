@@ -138,6 +138,20 @@ services:
     secrets:
       - lit-ui-password
 
+  charge-lnd:
+    <<: *lnd-service-defaults
+    image: r0shii/charge-lnd:dev
+    build:
+      <<: *build-defaults
+      args:
+        VERSION: v0.2.12
+      dockerfile: charge-lnd.Dockerfile
+    container_name: charge-lnd
+    # configs:
+    #   - charge-lnd
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
+
 networks:
   private:
     driver: bridge

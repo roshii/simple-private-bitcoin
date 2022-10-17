@@ -20,7 +20,7 @@ x-lnd-service-defaults: &lnd-service-defaults
 services:
   tor:
     <<: *defaults
-    image: r0shii/tor:2022.10.11
+    image: r0shii/tor:2022.10.17
     build:
       <<: *build-defaults
       dockerfile: tor.Dockerfile
@@ -36,7 +36,7 @@ services:
 
   bitcoin:
     <<: *defaults
-    image: r0shii/bitcoin:2022.10.11
+    image: r0shii/bitcoin:2022.10.17
     build:
       <<: *build-defaults
       args:
@@ -61,7 +61,7 @@ services:
     profiles:
     - do-not-start
     <<: *defaults
-    image: r0shii/joinmarket:2022.10.11
+    image: r0shii/joinmarket:2022.10.17
     build:
       <<: *build-defaults
       args:
@@ -82,7 +82,7 @@ services:
 
   lnd:
     <<: *defaults
-    image: r0shii/lnd:2022.10.11
+    image: r0shii/lnd:2022.10.17
     build:
       <<: *build-defaults
       args:
@@ -106,7 +106,7 @@ services:
     profiles:
     - do-not-start
     <<: *lnd-service-defaults
-    image: r0shii/lndconnect:2022.10.11
+    image: r0shii/lndconnect:2022.10.17
     build:
       <<: *build-defaults
       dockerfile: lndconnect.Dockerfile
@@ -117,7 +117,7 @@ services:
 
   lit:
     <<: *lnd-service-defaults
-    image: r0shii/lightning-terminal:2022.10.11
+    image: r0shii/lightning-terminal:2022.10.17
     build:
       <<: *build-defaults
       args:
@@ -137,6 +137,22 @@ services:
       - pool:/home/satoshi/.pool
     secrets:
       - lit-ui-password
+
+  charge-lnd:
+    profiles:
+    - do-not-start
+    <<: *lnd-service-defaults
+    image: r0shii/charge-lnd:2022.10.17
+    build:
+      <<: *build-defaults
+      args:
+        VERSION: v0.2.12
+      dockerfile: charge-lnd.Dockerfile
+    container_name: charge-lnd
+    configs:
+      - charge-lnd
+    volumes:
+      - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
 
 networks:
   private:
@@ -164,6 +180,8 @@ configs:
     file: ./configs/joinmarket.cfg
   lit:
     file: ./configs/lit.conf
+  charge-lnd:
+    file: ./configs/charge-lnd.conf
 
 secrets:
   lnd-wallet-unlock-password:

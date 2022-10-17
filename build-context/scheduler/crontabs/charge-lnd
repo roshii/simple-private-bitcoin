@@ -1,0 +1,1 @@
+*/15 * * * * /usr/scheduler/jobs/charge-lnd.sh

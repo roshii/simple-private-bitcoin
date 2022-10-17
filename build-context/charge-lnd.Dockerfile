@@ -18,9 +18,9 @@ FROM python:alpine
 RUN addgroup -g 913 nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
-RUN apk add libstdc++
-
 COPY --from=builder /whl /whl
-RUN pip install --no-cache /whl/*
+RUN apk add libstdc++ \
+  && pip install --no-cache /whl/*
+
 
 USER satoshi:nakamoto

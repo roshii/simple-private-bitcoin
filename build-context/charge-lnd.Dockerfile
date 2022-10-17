@@ -22,5 +22,8 @@ COPY --from=builder /whl /whl
 RUN apk add libstdc++ \
   && pip install --no-cache /whl/*
 
+WORKDIR /usr/scheduler
+COPY ./scheduler/ ./
 
-USER satoshi:nakamoto
+ENTRYPOINT [ "./start.sh" ]
+CMD [ "charge-lnd" ]

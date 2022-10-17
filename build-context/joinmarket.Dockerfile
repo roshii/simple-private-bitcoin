@@ -25,8 +25,7 @@ RUN apk add libffi-dev openssl-dev
 ARG VERSION_TAG=v0.9.8
 RUN git clone --depth 1 --branch ${VERSION_TAG} \
   https://github.com/JoinMarket-Org/joinmarket-clientserver.git .
-RUN pip install --no-cache -U pip setuptools \
-  && pip wheel --no-cache --no-deps -w /srv \
+RUN pip wheel --no-cache --no-deps -w /srv \
   -r requirements/base.txt \
   cryptography==3.3.2
 

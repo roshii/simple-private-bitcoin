@@ -8,6 +8,7 @@ Simple, self-hosted and self-managed containerized Bitcoin services definition.
 * lnd
 * lndconnect
 * lightning-terminal
+* charge-lnd
 
 ## Installation
 
@@ -46,6 +47,10 @@ docker compose run -it --rm lnd lncli create
 ### Lightning Terminal
 
 [`lit`](https://docs.lightning.engineering/lightning-network-tools/lightning-terminal) service will start automatically and allow you to interact with your lnd node at `https://your-host:8443`
+
+### Charge LND
+
+[`charge-lnd`](https://github.com/accumulator/charge-lnd) service matches your open Lightning channels against a number of customizable criteria and applies channel fees based on the matching policy. `charge-lnd.conf` must be updated with desired fee policy. 
 
 ## Reindex blocks from existing volume.
 

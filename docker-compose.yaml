@@ -139,6 +139,8 @@ services:
       - lit-ui-password
 
   charge-lnd:
+    profiles:
+    - do-not-start
     <<: *lnd-service-defaults
     image: r0shii/charge-lnd:dev
     build:
@@ -147,8 +149,8 @@ services:
         VERSION: v0.2.12
       dockerfile: charge-lnd.Dockerfile
     container_name: charge-lnd
-    # configs:
-    #   - charge-lnd
+    configs:
+      - charge-lnd
     volumes:
       - ${LND_DATA_MOUNTPOINT:-.data/lnd}:/home/satoshi/.lnd:ro
 
@@ -178,6 +180,8 @@ configs:
     file: ./configs/joinmarket.cfg
   lit:
     file: ./configs/lit.conf
+  charge-lnd:
+    file: ./configs/charge-lnd.conf
 
 secrets:
   lnd-wallet-unlock-password:

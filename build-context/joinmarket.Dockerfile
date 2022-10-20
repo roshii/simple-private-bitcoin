@@ -29,13 +29,14 @@ RUN pip wheel --no-cache --no-deps -w /srv \
   -r requirements/base.txt \
   cryptography==3.3.2
 
-FROM python:alpine
+FROM python:alpine AS final
 RUN addgroup -g 913 nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
 COPY --from=libsecp256k1 /srv /usr/local
 COPY --from=builder /srv /tmp/pip
 RUN apk add libsodium \
+  && rm -rf /var/cache/apk/* \
   && pip install --no-cache /tmp/pip/*
 
 WORKDIR /opt/jm

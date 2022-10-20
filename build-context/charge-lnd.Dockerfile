@@ -14,12 +14,13 @@ RUN pip wheel --no-cache --no-deps -w /whl \
   -r requirements.txt \
   .
 
-FROM python:alpine
+FROM python:alpine AS final
 RUN addgroup -g 913 nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
 COPY --from=builder /whl /whl
 RUN apk add libstdc++ \
+  && rm -rf /var/cache/apk/* \
   && pip install --no-cache /whl/*
 
 WORKDIR /usr/scheduler

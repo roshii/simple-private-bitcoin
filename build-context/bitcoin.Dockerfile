@@ -45,7 +45,7 @@ RUN ./autogen.sh \
   && make install \
   && rm /srv/bin/bitcoind
 
-FROM alpine
+FROM alpine AS final
 RUN addgroup -g 913 nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 
@@ -55,7 +55,8 @@ RUN apk add \
   capnproto \
   libevent \
   sqlite-dev \
-  zeromq
+  zeromq \
+  && rm -rf /var/cache/apk/*
 
 RUN install -o satoshi -g nakamoto -d /blocks \
   && install -o satoshi -g nakamoto -d /var/lib/bitcoin

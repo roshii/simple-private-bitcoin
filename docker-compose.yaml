@@ -137,8 +137,6 @@ services:
       - lit-ui-password
 
   charge-lnd:
-    profiles:
-    - do-not-start
     <<: *lnd-service-defaults
     image: r0shii/charge-lnd:dev
     build:

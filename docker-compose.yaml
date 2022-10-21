@@ -158,12 +158,12 @@ networks:
         - subnet: 10.3.1.0/24
 
 volumes:
-  tor:
   bitcoin:
   faraday:
   lit:
   loop:
   pool:
+  tor:
 
 configs:
   torrc:

@@ -1,17 +1,14 @@
 #!/bin/ash
-set -e
+set -eux
 
-DATADIR="/srv"
-SCRIPTDIR="/opt/jm"
+SSLDIR="/home/satoshi/.joinmarket/ssl"
 
-CMD="$1"
-SCRIPTS=$(find "$SCRIPTDIR" -name "$CMD" -type f -print)
-
-if [ "$CMD" == "joinmarketd.py" ] ; then
-  exec python "$@"
-elif [ -n "$SCRIPTS" ] ; then
-  shift
-  exec python "$CMD" "--datadir=${DATADIR}" "$@"
-else
-  exec "$@"
+if [ ! -e "${SSLDIR}/key.pem" ] ; then
+  mkdir -p "$SSLDIR"
+  openssl ecparam -name secp256k1 -genkey -noout -out "${SSLDIR}/key.pem"
+  openssl ec -in "${SSLDIR}/key.pem" -pubout -out "${SSLDIR}/pub.pem"
+  openssl req -new -x509 -key "${SSLDIR}/key.pem" -out "${SSLDIR}/cert.pem" -days 360 -nodes \
+    -subj "/CN=joinmarket"
 fi
+
+"$@"

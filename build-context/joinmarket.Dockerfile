@@ -35,7 +35,11 @@ RUN addgroup -g 913 nakamoto \
 
 COPY --from=libsecp256k1 /srv /usr/local
 COPY --from=builder /srv /tmp/pip
-RUN apk add libsodium \
+COPY --from=builder /src/scripts /opt/jm
+
+RUN apk add \
+  libsodium \
+  openssl \
   && rm -rf /var/cache/apk/* \
   && pip install --no-cache /tmp/pip/*
 
@@ -43,4 +47,5 @@ WORKDIR /opt/jm
 
 USER satoshi:nakamoto
 
-COPY --from=builder /src/scripts /opt/jm
+COPY ./joinmarket-entrypoint.sh /
+ENTRYPOINT [ "/joinmarket-entrypoint.sh" ]

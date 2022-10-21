@@ -58,8 +58,6 @@ services:
       - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/satoshi/.bitcoin
 
   joinmarket:
-    profiles:
-    - do-not-start
     <<: *defaults
     image: r0shii/joinmarket:dev
     build:
@@ -67,10 +65,10 @@ services:
       args:
         VERSION_TAG: v0.9.8
       dockerfile: joinmarket.Dockerfile
-    command: python yg-privacyenhanced.py --datadir=/srv wallet.jmdat
+    command: jmwalletd.py
     configs:
       - source: jm
-        target: /srv/joinmarket.cfg
+        target: /home/satoshi/.joinmarket/joinmarket.cfg
     container_name: joinmarket
     depends_on:
       bitcoin:
@@ -78,7 +76,7 @@ services:
     volumes:
       - tor:/var/lib/tor:ro
       - bitcoin:/var/lib/bitcoin:ro
-      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
+      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/home/satoshi/.joinmarket
 
   lnd:
     <<: *defaults

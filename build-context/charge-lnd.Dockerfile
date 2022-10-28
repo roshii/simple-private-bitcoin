@@ -1,8 +1,5 @@
 FROM python:alpine AS builder
-RUN apk add \
-  build-base \
-  git \
-  linux-headers
+RUN apk add git
 
 WORKDIR /src
 
@@ -10,9 +7,7 @@ ARG VERSION_TAG=v0.2.12
 RUN git clone --depth 1 --branch ${VERSION_TAG} \
   https://github.com/accumulator/charge-lnd.git .
 
-RUN pip wheel --no-cache --no-deps -w /whl \
-  -r requirements.txt \
-  .
+RUN pip wheel --no-cache --no-deps -w /whl .
 
 FROM python:alpine AS final
 RUN addgroup -g 913 nakamoto \

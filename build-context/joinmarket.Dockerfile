@@ -1,4 +1,4 @@
-FROM python:alpine AS build-base
+FROM python:3.10-alpine AS build-base
 WORKDIR /src
 RUN apk add \
   autoconf \
@@ -29,7 +29,7 @@ RUN pip wheel --no-cache --no-deps -w /srv \
   -r requirements/base.txt \
   cryptography==3.3.2
 
-FROM python:alpine AS final
+FROM python:3.10-alpine AS final
 RUN addgroup -g 913 nakamoto \
   && adduser -g satoshi -G nakamoto -S -D -u 913 satoshi
 

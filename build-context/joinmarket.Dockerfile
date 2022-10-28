@@ -1,31 +1,37 @@
 FROM python:3.10-alpine AS build-base
-WORKDIR /src
 RUN apk add \
-  autoconf \
-  automake \
-  build-base \
-  git \
-  libtool
+    build-base \
+    git \
+  && rm -rf /var/cache/apk/*
+
+WORKDIR /src
 
 FROM build-base AS libsecp256k1
-RUN apk add linux-headers
-
-RUN git clone --depth 1 https://github.com/bitcoin-core/secp256k1 .
-RUN ./autogen.sh \
+RUN git clone --depth 1 https://github.com/bitcoin-core/secp256k1 . \
+  && apk add \
+    autoconf \
+    automake \
+    build-base \
+    libtool \
+    linux-headers \
+  && rm -rf /var/cache/apk/* \
+  && ./autogen.sh \
   && ./configure \
-  --disable-benchmark \
-  --disable-tests \
-  --prefix=/srv \
+    --disable-benchmark \
+    --disable-tests \
+    --prefix=/srv \
   && make -j $(nproc) \
   && make install
 
 FROM build-base AS builder
-RUN apk add libffi-dev openssl-dev
 
 ARG VERSION_TAG=v0.9.8
 RUN git clone --depth 1 --branch ${VERSION_TAG} \
-  https://github.com/JoinMarket-Org/joinmarket-clientserver.git .
-RUN pip wheel --no-cache --no-deps -w /srv \
+  https://github.com/JoinMarket-Org/joinmarket-clientserver.git . \
+  && apk add \
+    libffi-dev \
+    openssl-dev \
+  && pip wheel --no-cache --no-deps -w /srv \
   -r requirements/base.txt \
   cryptography==3.3.2
 

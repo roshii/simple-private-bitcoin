@@ -55,4 +55,4 @@ USER satoshi:nakamoto
 
 ENV WALLET_FILE=wallet.jmdat
 ENV WALLET_PWD=/run/secrets/jm-wallet-password
-CMD [ "cat", "$WALLET_PWD", "|", "python", "yg-privacyenhanced.py", "$WALLET", "--wallet-password-stdin "]
+CMD cat "$WALLET_PWD" | python yg-privacyenhanced.py "$WALLET_FILE" --wallet-password-stdin

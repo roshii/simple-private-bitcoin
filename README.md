@@ -26,11 +26,6 @@ Joinmarket wallet on the other hand has to be created interactively with:
 docker compose exec joinmarket run wallet-tool.py generate
 ```
 
-Yield generator can then be started with:
-```shell
-docker compose exec joinmarket run yg-privacyenhanced.py
-```
-
 ### LND
 LND deamon will be started automatically as soon as `bitcoin` service is healthy. Its wallet must either be created or unlocked as follows to further interact with service. See [LND wallet documentation](https://github.com/lightningnetwork/lnd/blob/master/docs/wallet.md) for more information.
 

@@ -20,7 +20,7 @@ x-lnd-service-defaults: &lnd-service-defaults
 services:
   tor:
     <<: *defaults
-    image: r0shii/tor:2022.10.17
+    image: r0shii/tor:v22.11.6
     build:
       <<: *build-defaults
       dockerfile: tor.Dockerfile
@@ -36,7 +36,7 @@ services:
 
   bitcoin:
     <<: *defaults
-    image: r0shii/bitcoin:2022.10.17
+    image: r0shii/bitcoin:v22.11.6
     build:
       <<: *build-defaults
       args:
@@ -58,19 +58,16 @@ services:
       - ${BITCOIN_DATA_MOUNTPOINT:-.data/bitcoin}:/home/satoshi/.bitcoin
 
   joinmarket:
-    profiles:
-    - do-not-start
     <<: *defaults
-    image: r0shii/joinmarket:2022.10.17
+    image: r0shii/joinmarket:v22.11.6
     build:
       <<: *build-defaults
       args:
         VERSION_TAG: v0.9.8
       dockerfile: joinmarket.Dockerfile
-    command: python yg-privacyenhanced.py --datadir=/srv wallet.jmdat
     configs:
       - source: jm
-        target: /srv/joinmarket.cfg
+        target: /home/satoshi/.joinmarket/joinmarket.cfg
     container_name: joinmarket
     depends_on:
       bitcoin:
@@ -78,15 +75,17 @@ services:
     volumes:
       - tor:/var/lib/tor:ro
       - bitcoin:/var/lib/bitcoin:ro
-      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/srv
+      - ${JOINMARKET_DATA_MOUNTPOINT:-.data/joinmarket}:/home/satoshi/.joinmarket
+    secrets:
+      - jm-wallet-password
 
   lnd:
     <<: *defaults
-    image: r0shii/lnd:2022.10.17
+    image: r0shii/lnd:v22.11.6
     build:
       <<: *build-defaults
       args:
-        VERSION_TAG: v0.15.2-beta
+        VERSION_TAG: v0.15.4-beta
       dockerfile: lnd.Dockerfile
     container_name: lnd
     configs:
@@ -106,7 +105,7 @@ services:
     profiles:
     - do-not-start
     <<: *lnd-service-defaults
-    image: r0shii/lndconnect:2022.10.17
+    image: r0shii/lndconnect:v22.11.6
     build:
       <<: *build-defaults
       dockerfile: lndconnect.Dockerfile
@@ -117,11 +116,11 @@ services:
 
   lit:
     <<: *lnd-service-defaults
-    image: r0shii/lightning-terminal:2022.10.17
+    image: r0shii/lightning-terminal:v22.11.6
     build:
       <<: *build-defaults
       args:
-        VERSION: v0.8.1-alpha
+        VERSION: v0.8.3-alpha
       dockerfile: lit.Dockerfile
     container_name: lightning-terminal
     configs:
@@ -139,10 +138,8 @@ services:
       - lit-ui-password
 
   charge-lnd:
-    profiles:
-    - do-not-start
     <<: *lnd-service-defaults
-    image: r0shii/charge-lnd:2022.10.17
+    image: r0shii/charge-lnd:v22.11.6
     build:
       <<: *build-defaults
       args:
@@ -162,12 +159,12 @@ networks:
         - subnet: 10.3.1.0/24
 
 volumes:
-  tor:
   bitcoin:
   faraday:
   lit:
   loop:
   pool:
+  tor:
 
 configs:
   torrc:
@@ -188,3 +185,5 @@ secrets:
     file: ${SECRET_DATA_MOUNTPOINT:-.secrets}/lnd-wallet-unlock-password
   lit-ui-password:
     file: ${SECRET_DATA_MOUNTPOINT:-.secrets}/lit-ui-password
+  jm-wallet-password:
+    file: ${SECRET_DATA_MOUNTPOINT:-.secrets}/jm-wallet-password

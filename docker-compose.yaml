@@ -20,7 +20,7 @@ x-lnd-service-defaults: &lnd-service-defaults
 services:
   tor:
     <<: *defaults
-    image: r0shii/tor:dev
+    image: r0shii/tor:v22.11.6
     build:
       <<: *build-defaults
       dockerfile: tor.Dockerfile
@@ -36,7 +36,7 @@ services:
 
   bitcoin:
     <<: *defaults
-    image: r0shii/bitcoin:dev
+    image: r0shii/bitcoin:v22.11.6
     build:
       <<: *build-defaults
       args:
@@ -59,7 +59,7 @@ services:
 
   joinmarket:
     <<: *defaults
-    image: r0shii/joinmarket:dev
+    image: r0shii/joinmarket:v22.11.6
     build:
       <<: *build-defaults
       args:
@@ -81,7 +81,7 @@ services:
 
   lnd:
     <<: *defaults
-    image: r0shii/lnd:dev
+    image: r0shii/lnd:v22.11.6
     build:
       <<: *build-defaults
       args:
@@ -105,7 +105,7 @@ services:
     profiles:
     - do-not-start
     <<: *lnd-service-defaults
-    image: r0shii/lndconnect:dev
+    image: r0shii/lndconnect:v22.11.6
     build:
       <<: *build-defaults
       dockerfile: lndconnect.Dockerfile
@@ -116,7 +116,7 @@ services:
 
   lit:
     <<: *lnd-service-defaults
-    image: r0shii/lightning-terminal:dev
+    image: r0shii/lightning-terminal:v22.11.6
     build:
       <<: *build-defaults
       args:
@@ -139,7 +139,7 @@ services:
 
   charge-lnd:
     <<: *lnd-service-defaults
-    image: r0shii/charge-lnd:dev
+    image: r0shii/charge-lnd:v22.11.6
     build:
       <<: *build-defaults
       args:

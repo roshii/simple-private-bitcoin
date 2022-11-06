@@ -84,7 +84,7 @@ services:
     build:
       <<: *build-defaults
       args:
-        VERSION_TAG: v0.15.2-beta
+        VERSION_TAG: v0.15.4-beta
       dockerfile: lnd.Dockerfile
     container_name: lnd
     configs:

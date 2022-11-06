@@ -25,7 +25,7 @@ RUN git clone --depth 1 https://github.com/bitcoin-core/secp256k1 . \
 
 FROM build-base AS builder
 
-ARG VERSION_TAG=v0.9.8
+ARG VERSION_TAG=master
 RUN git clone --depth 1 --branch ${VERSION_TAG} \
   https://github.com/JoinMarket-Org/joinmarket-clientserver.git . \
   && apk add \

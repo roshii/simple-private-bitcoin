@@ -53,5 +53,6 @@ WORKDIR /opt/jm
 
 USER satoshi:nakamoto
 
-COPY ./joinmarket-entrypoint.sh /
-ENTRYPOINT [ "/joinmarket-entrypoint.sh" ]
+ENV WALLET_FILE=wallet.jmdat
+ENV WALLET_PWD=/run/secrets/jm-wallet-password
+CMD [ "cat", "$WALLET_PWD", "|", "python", "yg-privacyenhanced.py", "$WALLET", "--wallet-password-stdin "]
